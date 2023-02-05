@@ -23,10 +23,13 @@ public class BalanceController {
 
     @Resource
     private BalanceService balanceService;
+ 
 
     @ApiOperation(value = "余额")
     @GetMapping
     public List<Balance> list() {
-        return balanceService.list();
+        List<Balance> balanceList = balanceService.list();
+        return balanceList;
     }
+
 }

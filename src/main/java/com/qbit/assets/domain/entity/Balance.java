@@ -1,6 +1,5 @@
 package com.qbit.assets.domain.entity;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.qbit.assets.domain.base.BaseV2;
 import lombok.Data;
@@ -38,9 +37,6 @@ public class Balance extends BaseV2 {
     private BigDecimal frozen;
 
     private String status;
-
-    @TableField("systemUniqueId")
-    private String systemUniqueId;
 
 
 }
