@@ -31,9 +31,10 @@ public class R extends HashMap<String, Object> {
         return r;
     }
 
-    public static R ok(String data) {
+    public static R ok(String data, String msg) {
         R r = new R();
         r.put("data", data);
+        r.put("msg", msg);
         return r;
     }
 

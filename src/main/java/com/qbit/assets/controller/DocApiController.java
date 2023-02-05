@@ -6,7 +6,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,7 +18,7 @@ import javax.annotation.Resource;
 /**
  * @author martinjiang
  */
-@Api(tags = "首页模块")
+@Api(tags = "doc模块")
 @RestController
 @Slf4j
 @RequestMapping("/api/doc")
@@ -36,25 +35,4 @@ public class DocApiController {
         log.info("shdhdsjhdhshsgdshs" + name);
         return ResponseEntity.ok("Hi:" + name);
     }
-
-    @ApiImplicitParam(name = "name", value = "姓名", required = true)
-    @ApiOperation(value = "getRedis")
-    @GetMapping("/getRedis")
-    public ResponseEntity<String> getRedis(@RequestParam(value = "name") String name) {
-        String a = redisUtil.getAndSet("redisTest", name);
-        return ResponseEntity.ok("Hi:" + name);
-    }
-
-
-    @ApiImplicitParam(name = "key", value = "名称", required = true)
-    @ApiOperation(value = "getRedisson")
-    @GetMapping("/getRedisson")
-    public ResponseEntity<String> getRedisson(@RequestParam(value = "key") String name) throws InterruptedException {
-        RLock lock = redissonClient.getLock("redissonLock" + name);
-        lock.lock();
-        Thread.sleep(60 * 1000 * 3);
-        lock.unlock();
-        return ResponseEntity.ok("s");
-    }
-
 }

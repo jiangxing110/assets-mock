@@ -1,0 +1,71 @@
+server:
+  port: 8888
+
+spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://127.0.0.1:5432/assets_mock?stringtype=unspecified
+    username: root
+    password: 123456
+    # 连接池配置
+    initial-size: 5
+    min-idle: 5
+    max-active: 20
+    # 连接等待超时时间
+    max-wait: 30000
+
+  redis:
+    host: localhost
+    port: 6379
+    database: 0
+
+# mybatis-plus
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    map-underscore-to-camel-case: true
+    mapper-locations: mapper/*.xml
+
+third-party:
+  okx:
+    host: https://okx.qbitnetwork.com
+    key: a0331abd-3bd4-4eb9-9ebd-f8bce40e488f
+    secret: 4E8CBAFCE17DF15B274A86E7040E6DCF
+    passphrase: Qbit@dev22
+    ip: 39.108.155.220
+    broker-code: fe065d5dce39SCDE
+    sub-account-passphrase: Qbit@dev222
+    sub-account-perm: read_only
+    sub-account-prefix: qbit
+  
+  circle:
+    key: QVBJX0tFWTozNDExMzFhNWQ2MTU1NWNmNTcyN2NiNTMyMGE1M2RiYTpkZmYxNDE0ZTAyZTFlNWQxNzVkMTU0Y2I4NTNjMTJiMw==
+    host: https://api-sandbox.circle.com
+    master-wallet-id: "1000666007"
+  chain:
+    api-hosts:
+      # 需要注册账号
+      ETH: https://goerli.infura.io/v3/9776d4f844b6488d84c898e8a66e0b18
+      TRX: https://shastapi.tronscan.org
+      FLOW: https://rest-testnet.onflow.org/v1
+      # 需要翻墙
+      SOL: https://explorer-api.devnet.solana.com
+      ALGO: https://algoindexer.testnet.algoexplorerapi.io
+      AVAX: https://api.avax-test.network/ext/bc/C/rpc
+      HBAR: https://testnet.mirrornode.hedera.com
+      XLM: https://horizon-testnet.stellar.org
+    explorers:
+      ETH: https://goerli.etherscan.io
+      TRX: https://shasta.tronscan.org
+      FLOW: https://testnet.flowscan.org
+      ALGO: https://testnet.algoexplorer.io
+      AVAX: https://testnet.snowtrace.io
+      HBAR: https://testnet.dragonglass.me
+      SOL: https://explorer.solana.com
+      XLM: https://stellar.expert/explorer/testnet
+
+

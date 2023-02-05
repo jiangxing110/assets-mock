@@ -1,7 +1,12 @@
 package com.qbit.assets.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.qbit.assets.common.enums.ChainType;
+import com.qbit.assets.common.enums.CryptoAssetsPlatform;
+import com.qbit.assets.common.enums.CryptoConversionCurrencyEnum;
 import com.qbit.assets.domain.base.BaseV2;
+import com.qbit.assets.thirdparty.internal.circle.enums.CircleTransactionStatusEnum;
+import com.qbit.assets.thirdparty.internal.circle.enums.CircleWalletTypeEnum;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -23,7 +28,7 @@ public class PlatTransactions extends BaseV2 {
     /**
      * 发送方类型(wallet/blockchain)
      */
-    private String sourceType;
+    private CircleWalletTypeEnum sourceType;
 
     /**
      * 发送方id(wallet id)
@@ -33,7 +38,7 @@ public class PlatTransactions extends BaseV2 {
     /**
      * 接收方类型(wallet/blockchain)
      */
-    private String destinationType;
+    private CircleWalletTypeEnum destinationType;
 
     /**
      * 接收方id(wallet id)
@@ -65,30 +70,30 @@ public class PlatTransactions extends BaseV2 {
      */
     private String transactionHash;
 
-    /**
-     * 交易状态
-     */
-    private String status;
 
     /**
      * 链
      */
-    private String chain;
+    private ChainType chain;
 
     /**
      * 币种
      */
-    private String currency;
+    private CryptoConversionCurrencyEnum currency;
 
     /**
      * 发送方地址(address)
      */
     private String sourceAddress;
 
+
+    /**
+     * 交易状态
+     */
+    private CircleTransactionStatusEnum status;
+
     /**
      * 平台
      */
-    private String platform;
-
-
+    private CryptoAssetsPlatform platform;
 }
