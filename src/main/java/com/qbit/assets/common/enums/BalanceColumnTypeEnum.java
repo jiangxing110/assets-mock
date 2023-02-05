@@ -8,8 +8,17 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * @author martinjiang
  */
 public enum BalanceColumnTypeEnum {
+    /**
+     * 可用
+     */
     Available("available"),
+    /**
+     * 处理中
+     */
     Pending("Pending"),
+    /**
+     * 冻结
+     */
     Frozen("frozen");
 
     @JsonValue

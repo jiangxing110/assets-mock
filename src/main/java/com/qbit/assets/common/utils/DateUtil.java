@@ -140,25 +140,6 @@ public class DateUtil {
     }
 
 
-    public static String getWeekStartDate(String startTime) {
-        Date date;
-        try {
-            //定义起始日期
-            date = parse(startTime);
-        } catch (Exception e) {
-            System.out.println("时间转化异常，请检查你的时间格式是否为yyyy-MM或yyyy-MM-dd");
-            throw new CustomException(e.getMessage());
-        }
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(date);
-        cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-        cal.set(Calendar.HOUR_OF_DAY, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        return DATE_FORMAT_10.format(cal.getTime());
-    }
-
-
     /**
      * 计算时间(计算传入时间前几天或者后几天的时间)
      *
@@ -325,27 +306,7 @@ public class DateUtil {
         return calendar.getTime();
     }
 
-    public static String getMonthStartTime(String time) {
-        Date begin_date;
-        try {
-            //定义起始日期
-            begin_date = parse(time);
-        } catch (Exception e) {
-            throw new CustomException("时间转化异常，请检查你的时间格式是否为yyyy-MM或yyyy-MM-dd");
-        }
-        Calendar calendar = new GregorianCalendar();
-        calendar.setTime(begin_date);
-        // 设置创造新日期，这个日期是本月的最后一天
-        calendar.set(Calendar.DATE, 1);
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-        Date date = calendar.getTime();
-        return DATE_FORMAT_10.format(date);
-    }
 
-    
     public static class DateVo {
         public String getStartDate() {
             return startDate;
@@ -376,70 +337,6 @@ public class DateUtil {
 
     }
 
-    /**
-     * @Description: 获取时间段内所有自然月, 参数格式为:yyyy-MM-dd
-     * @Param: [startDate, endDate]
-     * @Return: java.util.List<Test.DateVo>
-     */
-    public static List<DateVo> getBetweenMonths(String startDate, String endDate) throws ParseException {
-        List<DateVo> list = null;
-        list = new ArrayList<DateVo>();
-        String firstDay = "";
-        String lastDay = "";
-        Date d1 = DATE_FORMAT_10.parse(startDate);// 定义起始日期
-        Date d2 = DATE_FORMAT_10.parse(endDate);// 定义结束日期
-
-        Calendar dd = Calendar.getInstance();// 开始日期日历
-        Calendar c = Calendar.getInstance();//结束日期日历
-        dd.setTime(d1);// 设置日期起始时间
-        c.setTime(d2);
-        Calendar cale = Calendar.getInstance();
-        int startDay = d1.getDate();
-        int endDay = d2.getDate();
-        DateVo keyValueForDate = null;
-        while (dd.getTime().before(d2)) {// 判断是否到结束日期
-            keyValueForDate = new DateVo();
-            cale.setTime(dd.getTime());
-            if (dd.getTime().equals(d1)) {
-                if ((dd.get(Calendar.MONTH) + 1) == (c.get(Calendar.MONTH) + 1) && (dd.get(Calendar.YEAR)) == (c.get(Calendar.YEAR) + 1)) {
-                    if (startDay == 1) {
-                        cale.set(Calendar.DATE, endDay - startDay + 1);
-                    } else {
-                        cale.set(Calendar.DATE, endDay);
-                    }
-                } else {
-                    cale.set(Calendar.DAY_OF_MONTH, dd.getActualMaximum(Calendar.DAY_OF_MONTH));
-                }
-                lastDay = DATE_FORMAT_10.format(cale.getTime());
-                keyValueForDate.setStartDate(DATE_FORMAT_10.format(d1));
-                keyValueForDate.setEndDate(lastDay);
-            } else if (dd.get(Calendar.MONTH) == d2.getMonth() && dd.get(Calendar.YEAR) == c.get(Calendar.YEAR)) {
-                cale.set(Calendar.DAY_OF_MONTH, 1);//取第一天
-                firstDay = DATE_FORMAT_10.format(cale.getTime());
-                keyValueForDate.setStartDate(firstDay);
-                keyValueForDate.setEndDate(DATE_FORMAT_10.format(d2));
-            } else {
-                cale.set(Calendar.DAY_OF_MONTH, 1);//取第一天
-                firstDay = DATE_FORMAT_10.format(cale.getTime());
-                cale.set(Calendar.DAY_OF_MONTH, dd.getActualMaximum(Calendar.DAY_OF_MONTH));
-                lastDay = DATE_FORMAT_10.format(cale.getTime());
-                keyValueForDate.setStartDate(firstDay);
-                keyValueForDate.setEndDate(lastDay);
-            }
-            list.add(keyValueForDate);
-            dd.add(Calendar.MONTH, 1);// 进行当前日期月份加1
-        }
-        if (endDay <= startDay) {
-            keyValueForDate = new DateVo();
-            cale.setTime(d2);
-            cale.set(Calendar.DAY_OF_MONTH, 1);//取第一天
-            firstDay = DATE_FORMAT_10.format(cale.getTime());
-            keyValueForDate.setStartDate(firstDay);
-            keyValueForDate.setEndDate(DATE_FORMAT_10.format(d2));
-            list.add(keyValueForDate);
-        }
-        return list;
-    }
 
     /**
      * @Description: 获取时间段内所有自然日, 参数格式为:yyyy-MM-dd
