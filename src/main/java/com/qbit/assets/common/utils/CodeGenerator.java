@@ -41,8 +41,12 @@ public class CodeGenerator {
                 .setUsername("root")
                 .setPassword("123456");
 
+
         // 映射数据库的表明
-        String[] strTableNames = {"assets_balance", "assets_account"};
+        String[] strTableNames = {"assets_transfers", "assets_operation_log"
+                , "assets_user", "assets_wallets", "assets_plat_transactions", "assets_chains", "assets_balance_transaction", "assets_transaction", "assets_address_pool", "assets_addresses", "assets_currencies_pairs",
+                "assets_estimate_quotes", "assets_payees", "assets_payees_addresses", "assets_platform_response", "assets_settle",
+                "assets_payees_banks", "assets_platform_sub_account", "assets_share_quotas"};
         //4. 包名策略配置
         PackageConfig pkConfig = new PackageConfig();
         pkConfig.setModuleName("assets");
