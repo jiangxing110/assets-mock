@@ -19,25 +19,6 @@ public class Payees extends BaseV2 {
     private String accountId;
 
     /**
-     * 收款人类型
-     */
-    private String type;
-
-    /**
-     * 链
-     */
-    private String chainType;
-
-    /**
-     * 币种
-     */
-    private String currency;
-
-    private String firstName;
-
-    private String lastName;
-
-    /**
      * address/bank account number/iban
      */
     private String accountNumber;
@@ -47,31 +28,20 @@ public class Payees extends BaseV2 {
      */
     private String status;
 
-    private String thirdPartyId;
-
-    private String username;
-
-    /**
-     * 同名账户
-     */
-    private Boolean sameName;
-
-    /**
-     * 是否是企业
-     */
-    private Boolean enterprise;
+    private String type;
 
     /**
      * 国家(银行开户国家)
      */
     private String country;
 
-    private String remarks;
+    private String description;
 
-    /**
-     * 提币免验证
-     */
-    private Boolean trusted;
+    private String trackingRef;
 
+    private Boolean virtualAccountEnabled;
+
+    private String fingerprint;
+    
 
 }

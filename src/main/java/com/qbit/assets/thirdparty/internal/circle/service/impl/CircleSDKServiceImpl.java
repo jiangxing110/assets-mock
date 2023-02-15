@@ -25,7 +25,7 @@ import java.util.*;
  */
 @Slf4j
 @Service
-@ConfigurationProperties("circle")
+@ConfigurationProperties("third-party.circle")
 public class CircleSDKServiceImpl implements CircleSDKService {
     @Resource
     private ObjectMapper objectMapper;

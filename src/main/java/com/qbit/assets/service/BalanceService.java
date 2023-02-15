@@ -2,9 +2,12 @@ package com.qbit.assets.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.qbit.assets.domain.entity.Balance;
+import com.qbit.assets.domain.vo.AccountBalanceVO;
+import com.qbit.assets.thirdparty.internal.okx.domain.vo.AssetsBalanceVO;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * <p>
@@ -64,4 +67,11 @@ public interface BalanceService extends IService<Balance> {
      * @return
      */
     Balance findBalanceByIdForUpdate(String id);
+
+    /**
+     * 根据钱包类型币种获取钱包列表
+     */
+    List<AssetsBalanceVO> getOkxBalances(String[] ccy, String walletType, String accountId);
+
+    AccountBalanceVO getCircleBalances();
 }

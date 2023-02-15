@@ -3,6 +3,8 @@ package com.qbit.assets.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.qbit.assets.domain.entity.EstimateQuotes;
+import com.qbit.assets.thirdparty.internal.okx.domain.dto.ConvertEstimateQuoteDTO;
+import com.qbit.assets.thirdparty.internal.okx.domain.vo.ConvertEstimateQuoteVO;
 
 /**
  * <p>
@@ -14,4 +16,5 @@ import com.qbit.assets.domain.entity.EstimateQuotes;
  */
 public interface EstimateQuotesService extends IService<EstimateQuotes> {
 
+    ConvertEstimateQuoteVO getEstimateQuote(ConvertEstimateQuoteDTO body);
 }

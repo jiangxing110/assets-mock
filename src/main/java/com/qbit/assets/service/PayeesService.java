@@ -3,6 +3,8 @@ package com.qbit.assets.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.qbit.assets.domain.entity.Payees;
+import com.qbit.assets.thirdparty.internal.circle.domain.dto.BankWireDTO;
+import com.qbit.assets.thirdparty.internal.circle.domain.vo.BankWireVO;
 
 /**
  * <p>
@@ -14,4 +16,7 @@ import com.qbit.assets.domain.entity.Payees;
  */
 public interface PayeesService extends IService<Payees> {
 
+    BankWireVO wires(BankWireDTO body);
+
+    BankWireVO instructions(String bankAccountId);
 }

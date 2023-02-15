@@ -42,9 +42,7 @@ public class MybatisPlusConfig {
 
     @Bean
     public MybatisPlusInterceptor mybatisPlusInterceptor() {
-
         MybatisPlusInterceptor mybatisPlusInterceptor = new MybatisPlusInterceptor();
-
         // 分页插件
         // 添加分页插件 id
         PaginationInnerInterceptor pageInterceptor = new PaginationInnerInterceptor();
@@ -55,7 +53,6 @@ public class MybatisPlusConfig {
         // 设置数据库类型
         pageInterceptor.setDbType(DbType.POSTGRE_SQL);
         mybatisPlusInterceptor.addInnerInterceptor(pageInterceptor);
-
         // 乐观锁插件
         mybatisPlusInterceptor.addInnerInterceptor(new OptimisticLockerInnerInterceptor());
         return mybatisPlusInterceptor;

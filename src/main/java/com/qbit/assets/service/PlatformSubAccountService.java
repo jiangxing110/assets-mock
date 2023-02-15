@@ -6,10 +6,7 @@ import com.qbit.assets.domain.entity.PlatformSubAccount;
 import com.qbit.assets.thirdparty.internal.okx.domain.dto.CreateDepositAddressDTO;
 import com.qbit.assets.thirdparty.internal.okx.domain.dto.CreateSubAccountDTO;
 import com.qbit.assets.thirdparty.internal.okx.domain.dto.SubAccountDepositDTO;
-import com.qbit.assets.thirdparty.internal.okx.domain.vo.SubAccountApiKeyVO;
-import com.qbit.assets.thirdparty.internal.okx.domain.vo.SubAccountDepositAddressVO;
-import com.qbit.assets.thirdparty.internal.okx.domain.vo.SubAccountDepositVO;
-import com.qbit.assets.thirdparty.internal.okx.domain.vo.SubAccountVO;
+import com.qbit.assets.thirdparty.internal.okx.domain.vo.*;
 
 import java.util.List;
 
@@ -32,4 +29,6 @@ public interface PlatformSubAccountService extends IService<PlatformSubAccount> 
     List<SubAccountDepositAddressVO> getDepositAddresses(String subAcct, String ccy);
 
     List<SubAccountDepositVO> subAccountDepositHistory(SubAccountDepositDTO body);
+
+    ConvertCurrencyPairVO getCurrencyPair(String fromCcy, String toCcy);
 }

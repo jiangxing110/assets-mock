@@ -27,7 +27,6 @@ public class RedissonConfig {
 
     @Bean
     public RedissonClient redissonClient() {
-
         Config config = new Config();
         //单节点
         config.useSingleServer().setAddress("redis://" + host + ":" + port);

@@ -40,19 +40,6 @@ public class CircleServiceImpl implements CircleService {
     private HttpService httpService;
     public static Pattern pattern = Pattern.compile("^arn:aws:sns:.*:908968368384:(sandbox|prod)_platform-notifications-topic$");
 
-
-    /**
-     * 健康检查
-     *
-     * @return boolean
-     * @author martinjiang
-     * @date 2023/2/5 14:32
-     */
-    @Override
-    public boolean health() {
-        return circleSdk.health();
-    }
-
     @Override
     public void notifications(Map<String, Object> params) {
         SubscriptionDTO body = JsonUtil.toBean(params, SubscriptionDTO.class);
@@ -209,7 +196,7 @@ public class CircleServiceImpl implements CircleService {
         return transaction;
     }
 
-  
+
     private PlatTransactions convert(ReturnVO data) {
         return new PlatTransactions();
     }

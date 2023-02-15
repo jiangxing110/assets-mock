@@ -24,6 +24,11 @@ public class PayeesBanks extends BaseV2 {
     private String routingNumber;
 
     /**
+     * 账户ID
+     */
+    private String accountId;
+
+    /**
      * 开户银行地址
      */
     private String bankAddressId;

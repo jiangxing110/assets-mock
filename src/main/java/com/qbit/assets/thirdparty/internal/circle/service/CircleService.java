@@ -10,9 +10,6 @@ import java.util.Map;
  */
 public interface CircleService {
 
-    boolean health();
-
-
     void notifications(Map<String, Object> params);
 
 

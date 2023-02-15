@@ -1,12 +1,18 @@
 package com.qbit.assets.service.impl;
 
 
+import cn.hutool.core.collection.CollectionUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.qbit.assets.common.enums.SpecialUUID;
 import com.qbit.assets.common.error.CustomException;
 import com.qbit.assets.common.utils.RedisLockUtil;
 import com.qbit.assets.domain.entity.Balance;
+import com.qbit.assets.domain.vo.AccountBalanceVO;
 import com.qbit.assets.mapper.BalanceMapper;
 import com.qbit.assets.service.BalanceService;
+import com.qbit.assets.thirdparty.internal.circle.domain.vo.BalanceVO;
+import com.qbit.assets.thirdparty.internal.okx.domain.vo.AssetsBalanceVO;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.springframework.stereotype.Service;
@@ -17,6 +23,9 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author martinjiang
@@ -122,6 +131,50 @@ public class BalanceServiceImpl extends ServiceImpl<BalanceMapper, Balance> impl
     @Override
     public Balance findBalanceByIdForUpdate(String id) {
         return this.balanceMapper.findBalanceByIdForUpdate(id);
+    }
+
+    @Override
+    public List<AssetsBalanceVO> getOkxBalances(String[] ccys, String walletType, String accountId) {
+        LambdaQueryWrapper<Balance> balanceLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        if (ccys != null && ccys.length > 0) {
+            balanceLambdaQueryWrapper.in(Balance::getCurrency, ccys);
+        }
+        List<AssetsBalanceVO> assetsBalances = new ArrayList<>();
+        balanceLambdaQueryWrapper.eq(Balance::getAccountId, SpecialUUID.NullUUID.value());
+        balanceLambdaQueryWrapper.eq(Balance::getWalletType, "OkxWallet");
+        List<Balance> balances = balanceMapper.selectList(balanceLambdaQueryWrapper);
+        if (CollectionUtil.isNotEmpty(balances)) {
+            assetsBalances = balances.stream().map(e -> {
+                AssetsBalanceVO assetsBalanceVO = new AssetsBalanceVO();
+                assetsBalanceVO.setCcy(e.getCurrency());
+                assetsBalanceVO.setBal(e.getAvailable().toString());
+                assetsBalanceVO.setAvailBal(e.getAvailable().toString());
+                assetsBalanceVO.setFrozenBal(e.getFrozen().setScale(2, BigDecimal.ROUND_HALF_UP).toString());
+                return assetsBalanceVO;
+            }).collect(Collectors.toList());
+        }
+        return assetsBalances;
+    }
+
+    @Override
+    public AccountBalanceVO getCircleBalances() {
+        LambdaQueryWrapper<Balance> balanceLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        AccountBalanceVO assetsBalances = new AccountBalanceVO();
+        balanceLambdaQueryWrapper.eq(Balance::getAccountId, SpecialUUID.NullUUID.value());
+        balanceLambdaQueryWrapper.eq(Balance::getWalletType, "CircleWallet");
+        List<Balance> balances = balanceMapper.selectList(balanceLambdaQueryWrapper);
+        if (CollectionUtil.isNotEmpty(balances)) {
+            List<BalanceVO> available = balances.stream().map(e -> {
+                BalanceVO balanceVO = new BalanceVO();
+                balanceVO.setCurrency(e.getCurrency());
+                balanceVO.setAmount(e.getAvailable().toString());
+                return balanceVO;
+            }).collect(Collectors.toList());
+            assetsBalances.setAvailable(available);
+            List<BalanceVO> unsettled = new ArrayList<>();
+            assetsBalances.setUnsettled(unsettled);
+        }
+        return assetsBalances;
     }
 
     /**

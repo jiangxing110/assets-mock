@@ -6,26 +6,24 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.qbit.assets.common.enums.ChainType;
 import com.qbit.assets.common.enums.CryptoAssetsPlatform;
 import com.qbit.assets.domain.entity.Addresses;
+import com.qbit.assets.domain.entity.CurrenciesPairs;
 import com.qbit.assets.domain.entity.PlatTransactions;
 import com.qbit.assets.domain.entity.PlatformSubAccount;
 import com.qbit.assets.mapper.AddressesMapper;
 import com.qbit.assets.mapper.PlatformSubAccountMapper;
+import com.qbit.assets.service.CurrenciesPairsService;
 import com.qbit.assets.service.PlatTransactionsService;
 import com.qbit.assets.service.PlatformSubAccountService;
 import com.qbit.assets.thirdparty.internal.okx.domain.dto.CreateDepositAddressDTO;
 import com.qbit.assets.thirdparty.internal.okx.domain.dto.CreateSubAccountDTO;
 import com.qbit.assets.thirdparty.internal.okx.domain.dto.SubAccountDepositDTO;
-import com.qbit.assets.thirdparty.internal.okx.domain.vo.SubAccountApiKeyVO;
-import com.qbit.assets.thirdparty.internal.okx.domain.vo.SubAccountDepositAddressVO;
-import com.qbit.assets.thirdparty.internal.okx.domain.vo.SubAccountDepositVO;
-import com.qbit.assets.thirdparty.internal.okx.domain.vo.SubAccountVO;
+import com.qbit.assets.thirdparty.internal.okx.domain.vo.*;
 import com.qbit.assets.thirdparty.internal.okx.service.OkxBrokerService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -48,6 +46,8 @@ public class PlatformSubAccountServiceImpl extends ServiceImpl<PlatformSubAccoun
     private AddressesMapper addressesMapper;
     @Resource
     private PlatTransactionsService platTransactionsService;
+    @Resource
+    private CurrenciesPairsService currenciesPairsService;
 
     @Override
     public SubAccountVO createSubAccount(CreateSubAccountDTO body) {
@@ -56,8 +56,6 @@ public class PlatformSubAccountServiceImpl extends ServiceImpl<PlatformSubAccoun
         BeanUtils.copyProperties(subAccountVO, subAccount);
         subAccount.setPlatform("OKX");
         subAccount.setId(UUID.randomUUID().toString());
-        subAccount.setCreateTime(new Date());
-        subAccount.setUpdateTime(new Date());
         subAccount.setVersion(1);
         subAccountMapper.insert(subAccount);
         return subAccountVO;
@@ -97,7 +95,7 @@ public class PlatformSubAccountServiceImpl extends ServiceImpl<PlatformSubAccoun
 
     @Override
     public List<SubAccountDepositAddressVO> getDepositAddresses(String subAcct, String ccy) {
-        List<SubAccountDepositAddressVO> addressVOS = new ArrayList<>();
+        List<SubAccountDepositAddressVO> list = new ArrayList<>();
         SubAccountDepositAddressVO addressVO = new SubAccountDepositAddressVO();
         addressVO.setAddr("地址1");
         addressVO.setTs("1597026383085");
@@ -105,8 +103,8 @@ public class PlatformSubAccountServiceImpl extends ServiceImpl<PlatformSubAccoun
         addressVO.setCcy("USDT");
         addressVO.setChain("TRC-20");
         addressVO.setPmtId("");
-        addressVOS.add(addressVO);
-        return addressVOS;
+        list.add(addressVO);
+        return list;
     }
 
     @Override
@@ -130,5 +128,24 @@ public class PlatformSubAccountServiceImpl extends ServiceImpl<PlatformSubAccoun
             subAccountDepositVO.setSubAcct("hgshdhshd");
         }
         return null;
+    }
+
+    @Override
+    public ConvertCurrencyPairVO getCurrencyPair(String fromCcy, String toCcy) {
+        ConvertCurrencyPairVO convertCurrencyPairVO = new ConvertCurrencyPairVO();
+        LambdaQueryWrapper<CurrenciesPairs> wrapper = new LambdaQueryWrapper<>();
+        wrapper.in(CurrenciesPairs::getBaseCurrency, fromCcy, toCcy);
+        wrapper.in(CurrenciesPairs::getQuoteCurrency, fromCcy, toCcy);
+        CurrenciesPairs pair = currenciesPairsService.getOne(wrapper);
+        if (pair != null) {
+            convertCurrencyPairVO.setInstId(pair.getSymbol());
+            convertCurrencyPairVO.setBaseCcy(pair.getBaseCurrency());
+            convertCurrencyPairVO.setBaseCcyMax(pair.getBaseMax().toString());
+            convertCurrencyPairVO.setBaseCcyMin(pair.getBaseMin().toString());
+            convertCurrencyPairVO.setQuoteCcy(pair.getQuoteCurrency());
+            convertCurrencyPairVO.setQuoteCcyMax(pair.getQuoteMax().toString());
+            convertCurrencyPairVO.setQuoteCcyMin(pair.getQuoteMin().toString());
+        }
+        return convertCurrencyPairVO;
     }
 }
