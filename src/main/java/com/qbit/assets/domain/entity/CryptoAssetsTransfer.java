@@ -1,6 +1,7 @@
 package com.qbit.assets.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.qbit.assets.common.enums.*;
 import com.qbit.assets.domain.base.BaseV2;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -8,10 +9,13 @@ import lombok.EqualsAndHashCode;
 import java.math.BigDecimal;
 import java.util.Date;
 
+/**
+ * @author martinjiang
+ */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName("assets_transfers")
-public class Transfers extends BaseV2 {
+@TableName("assets_transfer")
+public class CryptoAssetsTransfer extends BaseV2 {
 
     private static final long serialVersionUID = 1L;
 
@@ -23,12 +27,12 @@ public class Transfers extends BaseV2 {
     /**
      * 交易状态
      */
-    private String status;
+    private CryptoAssetsTransferStatus status;
 
     /**
      * 交易类型(in/out)(转入/转出)
      */
-    private String action;
+    private CryptoAssetsTransferAction action;
 
     /**
      * 对方加密货币地址
@@ -53,12 +57,12 @@ public class Transfers extends BaseV2 {
     /**
      * 链
      */
-    private String chain;
+    private ChainType chain;
 
     /**
      * 结算币种
      */
-    private String currency;
+    private CryptoConversionCurrencyEnum currency;
 
     private String transactionId;
 
@@ -87,19 +91,19 @@ public class Transfers extends BaseV2 {
     /**
      * 交易发起方币种
      */
-    private String quoteCurrency;
+    private CryptoConversionCurrencyEnum quoteCurrency;
 
     private String businessTypeDetail;
 
     /**
      * 发送方类型
      */
-    private String senderType;
+    private CounterpartyType senderType;
 
     /**
      * 接收方类型
      */
-    private String recipientType;
+    private CounterpartyType recipientType;
 
     /**
      * 收款人id

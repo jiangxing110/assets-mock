@@ -1,9 +1,6 @@
 package com.qbit.assets.controller;
 
-import com.qbit.assets.service.BalanceService;
-import com.qbit.assets.service.EstimateQuotesService;
-import com.qbit.assets.service.PlatformSubAccountService;
-import com.qbit.assets.service.TransfersService;
+import com.qbit.assets.service.*;
 import com.qbit.assets.thirdparty.internal.okx.domain.dto.*;
 import com.qbit.assets.thirdparty.internal.okx.domain.vo.*;
 import com.qbit.assets.thirdparty.internal.okx.service.OkxAssetsService;
@@ -43,8 +40,9 @@ public class OkxController {
     @Resource
     private EstimateQuotesService estimateQuotesService;
     @Resource
-    private TransfersService transfersService;
-
+    private CryptoAssetsTransferService cryptoAssetsTransferService;
+    @Resource
+    private AssetsOkxService assetsOkxService;
 
     @ApiOperation(value = "获取币种列表")
     @GetMapping(ASSETS + "getCurrencies")
@@ -116,7 +114,7 @@ public class OkxController {
     @ApiOperation(value = "闪兑交易")
     @PostMapping(CONVERT + "trade")
     public ResponseEntity<ConvertTradeVO> trade(@RequestBody ConvertTradeDTO body) {
-        ConvertTradeVO estimateQuote = transfersService.trade(body);
+        ConvertTradeVO estimateQuote = assetsOkxService.trade(body);
         return ResponseEntity.ok(estimateQuote);
     }
 
@@ -124,7 +122,7 @@ public class OkxController {
     @ApiOperation(value = "获取闪兑交易历史")
     @GetMapping(CONVERT + "history")
     public ResponseEntity<List<ConvertTradeVO>> getHistory(@RequestParam Map<String, Object> params) {
-        List<ConvertTradeVO> trades = transfersService.getHistory(params);
+        List<ConvertTradeVO> trades = assetsOkxService.getHistory(params);
         return ResponseEntity.ok(trades);
     }
 
@@ -134,7 +132,7 @@ public class OkxController {
     public ResponseEntity<List<MarketTickerVO>> getTickers(@RequestParam("instType") String instType) {
         Map map = new HashMap();
         map.put("instType", instType);
-        List<MarketTickerVO> trades = transfersService.getTickers(map);
+        List<MarketTickerVO> trades = assetsOkxService.getTickers(map);
         return ResponseEntity.ok(trades);
     }
 
@@ -144,18 +142,15 @@ public class OkxController {
     public ResponseEntity<List<MarketTickerVO>> getTicker(@RequestParam("instId") String instId) {
         Map map = new HashMap();
         map.put("instId", instId);
-        List<MarketTickerVO> tickerVO = transfersService.getTickers(map);
+        List<MarketTickerVO> tickerVO = assetsOkxService.getTickers(map);
         return ResponseEntity.ok(tickerVO);
     }
 
 
+
+
 /*
-    @ApiOperation(value = "资金划转")
-    @PostMapping(ASSETS + "transfer")
-    public ResponseEntity<AssetsTransferVO> transfer(CreateAssetsTransferDTO body) {
-        AssetsTransferVO assetsBalances = subAccountService.transfer(body);
-        return ResponseEntity.ok(assetsBalances);
-    }
+
 
     @ApiOperation(value = "提现")
     @PostMapping(ASSETS + "withdrawal")

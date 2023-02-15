@@ -2,7 +2,7 @@ package com.qbit.assets.mapper;
 
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.qbit.assets.domain.entity.ShareQuotas;
+import com.qbit.assets.domain.entity.ShareQuota;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
@@ -14,6 +14,6 @@ import org.apache.ibatis.annotations.Mapper;
  * @since 2023-02-05
  */
 @Mapper
-public interface ShareQuotasMapper extends BaseMapper<ShareQuotas> {
+public interface ShareQuotasMapper extends BaseMapper<ShareQuota> {
 
 }

@@ -4,7 +4,7 @@ package com.qbit.assets.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.qbit.assets.common.enums.SpecialUUID;
 import com.qbit.assets.domain.entity.Payees;
-import com.qbit.assets.domain.entity.PayeesAddresses;
+import com.qbit.assets.domain.entity.PayeesAddresse;
 import com.qbit.assets.domain.entity.PayeesBanks;
 import com.qbit.assets.mapper.PayeesAddressesMapper;
 import com.qbit.assets.mapper.PayeesBanksMapper;
@@ -40,10 +40,10 @@ public class PayeesServiceImpl extends ServiceImpl<PayeesMapper, Payees> impleme
     @Override
     public BankWireVO wires(BankWireDTO body) {
         Payees payees = new Payees();
-        PayeesAddresses bankAddress = new PayeesAddresses();
+        PayeesAddresse bankAddress = new PayeesAddresse();
         BeanUtils.copyProperties(body.getBankAddress(), bankAddress);
 
-        PayeesAddresses billingAddress = new PayeesAddresses();
+        PayeesAddresse billingAddress = new PayeesAddresse();
         BeanUtils.copyProperties(body.getBillingDetails(), billingAddress);
         payeesAddressesMapper.insert(billingAddress);
         payeesAddressesMapper.insert(bankAddress);
@@ -85,9 +85,9 @@ public class PayeesServiceImpl extends ServiceImpl<PayeesMapper, Payees> impleme
         if (payeesBanks != null) {
             BankWireDTO.BillingDetailsDTO billingVo = new BankWireDTO.BillingDetailsDTO();
             BankWireDTO.BankAddressDTO bankVo = new BankWireDTO.BankAddressDTO();
-            PayeesAddresses bankAddress = payeesAddressesMapper.selectById(payeesBanks.getBankAddressId());
+            PayeesAddresse bankAddress = payeesAddressesMapper.selectById(payeesBanks.getBankAddressId());
             BeanUtils.copyProperties(bankAddress, bankVo);
-            PayeesAddresses billingDetails = payeesAddressesMapper.selectById(payeesBanks.getBillingAddressId());
+            PayeesAddresse billingDetails = payeesAddressesMapper.selectById(payeesBanks.getBillingAddressId());
             BeanUtils.copyProperties(billingDetails, billingVo);
             billingVo.setName(payeesBanks.getName());
             bankVo.setBankName(payeesBanks.getBankName());

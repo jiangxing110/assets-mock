@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.qbit.assets.common.enums.CryptoConversionCurrencyEnum;
 import com.qbit.assets.common.enums.SpecialUUID;
-import com.qbit.assets.domain.entity.Addresses;
+import com.qbit.assets.domain.entity.Addresse;
 import com.qbit.assets.mapper.AddressesMapper;
 import com.qbit.assets.service.AddressesService;
 import com.qbit.assets.thirdparty.internal.circle.domain.dto.AddressDTO;
@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @Slf4j
-public class AddressesServiceImpl extends ServiceImpl<AddressesMapper, Addresses> implements AddressesService {
+public class AddressesServiceImpl extends ServiceImpl<AddressesMapper, Addresse> implements AddressesService {
 
     @Resource
     private CircleSDKService sdk;
@@ -40,9 +40,9 @@ public class AddressesServiceImpl extends ServiceImpl<AddressesMapper, Addresses
     @Override
     public List<AddressVO> getAddresses(String walletId) {
         List<AddressVO> addressVOS = new ArrayList<>();
-        LambdaQueryWrapper<Addresses> addressesLambdaQueryWrapper = new LambdaQueryWrapper<>();
-        addressesLambdaQueryWrapper.eq(Addresses::getWalletId, walletId);
-        List<Addresses> addresses = this.list(addressesLambdaQueryWrapper);
+        LambdaQueryWrapper<Addresse> addressesLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        addressesLambdaQueryWrapper.eq(Addresse::getWalletId, walletId);
+        List<Addresse> addresses = this.list(addressesLambdaQueryWrapper);
         if (CollectionUtil.isNotEmpty(addresses)) {
             addressVOS = addresses.stream().map(e -> {
                 AddressVO addressVO = new AddressVO();
@@ -59,7 +59,7 @@ public class AddressesServiceImpl extends ServiceImpl<AddressesMapper, Addresses
     @Override
     public AddressVO createAddress(String walletId, AddressDTO body) {
         AddressVO addressVO = new AddressVO();
-        Addresses addresses = new Addresses();
+        Addresse addresses = new Addresse();
         addresses.setAccountId(SpecialUUID.NullUUID.value());
         addresses.setWalletId(walletId);
         addresses.setChain(body.getChain().getToken());

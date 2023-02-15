@@ -15,8 +15,8 @@ import java.math.BigDecimal;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName("assets_plat_transactions")
-public class PlatTransactions extends BaseV2 {
+@TableName("assets_plat_transaction")
+public class CryptoAssetsTransaction extends BaseV2 {
 
     private static final long serialVersionUID = 1L;
 

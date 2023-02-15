@@ -6,10 +6,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 
+/**
+ * @author martinjiang
+ */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName("assets_addresses")
-public class Addresses extends BaseV2 {
+@TableName("assets_addresse")
+public class Addresse extends BaseV2 {
 
     private static final long serialVersionUID = 1L;
 

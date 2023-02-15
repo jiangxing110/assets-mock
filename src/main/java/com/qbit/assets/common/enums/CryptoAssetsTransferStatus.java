@@ -1,6 +1,5 @@
 package com.qbit.assets.common.enums;
 
-
 import com.baomidou.mybatisplus.annotation.IEnum;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
@@ -69,5 +68,20 @@ public enum CryptoAssetsTransferStatus implements IEnum<String> {
         return null;
     }
 
-
+    public static CryptoAssetsTransferStatus valueOf(TransactionStatusEnum status) {
+        switch (status) {
+            case Closed -> {
+                return Closed;
+            }
+            case Pending -> {
+                return Processing;
+            }
+            case ToBeSupplementedByUser -> {
+                return ToBeSupplementedByUser;
+            }
+            default -> {
+                return Cancelled;
+            }
+        }
+    }
 }

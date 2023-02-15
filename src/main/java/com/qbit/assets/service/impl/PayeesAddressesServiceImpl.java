@@ -2,7 +2,7 @@ package com.qbit.assets.service.impl;
 
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.qbit.assets.domain.entity.PayeesAddresses;
+import com.qbit.assets.domain.entity.PayeesAddresse;
 import com.qbit.assets.mapper.PayeesAddressesMapper;
 import com.qbit.assets.service.PayeesAddressesService;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +18,6 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @Slf4j
-public class PayeesAddressesServiceImpl extends ServiceImpl<PayeesAddressesMapper, PayeesAddresses> implements PayeesAddressesService {
+public class PayeesAddressesServiceImpl extends ServiceImpl<PayeesAddressesMapper, PayeesAddresse> implements PayeesAddressesService {
 
 }

@@ -2,16 +2,15 @@ package com.qbit.assets.controller;
 
 import com.qbit.assets.domain.vo.AccountBalanceVO;
 import com.qbit.assets.service.AddressesService;
+import com.qbit.assets.service.AssetsOkxService;
 import com.qbit.assets.service.BalanceService;
 import com.qbit.assets.service.PayeesService;
-import com.qbit.assets.service.TransfersService;
 import com.qbit.assets.thirdparty.internal.circle.domain.dto.AddressDTO;
 import com.qbit.assets.thirdparty.internal.circle.domain.dto.BankWireDTO;
 import com.qbit.assets.thirdparty.internal.circle.domain.dto.PayoutDTO;
 import com.qbit.assets.thirdparty.internal.circle.domain.dto.PayoutPageDTO;
 import com.qbit.assets.thirdparty.internal.circle.domain.vo.*;
 import com.qbit.assets.thirdparty.internal.circle.service.CircleSDKService;
-import com.qbit.assets.thirdparty.internal.circle.service.CircleService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -34,8 +33,6 @@ import java.util.Map;
 @RequestMapping("")
 public class CircleController {
     @Resource
-    private CircleService circleService;
-    @Resource
     private CircleSDKService circleSDKService;
     @Resource
     private PayeesService payeesService;
@@ -44,7 +41,7 @@ public class CircleController {
     @Resource
     private AddressesService addressesService;
     @Resource
-    private TransfersService transfersService;
+    private AssetsOkxService assetsOkxService;
 
     @ApiOperation(value = "健康检查")
     @GetMapping("/ping")
@@ -106,22 +103,23 @@ public class CircleController {
     @ApiOperation(value = "创建payout")
     @PostMapping("/v1/payouts")
     public ResponseEntity<PayoutVO> payouts(@RequestBody PayoutDTO body) {
-        PayoutVO payoutVO = transfersService.payouts(body);
+        PayoutVO payoutVO = assetsOkxService.payouts(body);
         return ResponseEntity.ok(payoutVO);
     }
 
     @ApiOperation(value = "获取payout 详情")
     @GetMapping("/v1/payouts/" + "{id}")
     public ResponseEntity<PayoutVO> payouts(@PathVariable("id") String id) {
-        PayoutVO payoutVO = transfersService.getPayout(id);
+        PayoutVO payoutVO = assetsOkxService.getPayout(id);
         return ResponseEntity.ok(payoutVO);
     }
-    
+
     @ApiOperation(value = "查询payout 列表")
     @GetMapping("/v1/payouts")
     public ResponseEntity<List<PayoutVO>> payouts(PayoutPageDTO pageDTO) {
-        List<PayoutVO> payouts = transfersService.payoutList(pageDTO);
+        List<PayoutVO> payouts = assetsOkxService.payoutList(pageDTO);
         return ResponseEntity.ok(payouts);
     }
+
 
 }

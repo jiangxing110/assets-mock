@@ -1,6 +1,5 @@
 package com.qbit.assets.common.enums;
 
-
 import com.baomidou.mybatisplus.annotation.IEnum;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;

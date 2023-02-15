@@ -10,8 +10,8 @@ import java.math.BigDecimal;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName("assets_share_quotas")
-public class ShareQuotas extends BaseV2 {
+@TableName("assets_share_quota")
+public class ShareQuota extends BaseV2 {
 
     private static final long serialVersionUID = 1L;
 

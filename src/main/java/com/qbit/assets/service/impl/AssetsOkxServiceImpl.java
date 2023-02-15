@@ -1,16 +1,13 @@
 package com.qbit.assets.service.impl;
 
-
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.qbit.assets.domain.entity.Transfers;
-import com.qbit.assets.mapper.TransfersMapper;
-import com.qbit.assets.service.TransfersService;
+import com.qbit.assets.service.AssetsOkxService;
 import com.qbit.assets.thirdparty.internal.circle.domain.dto.PayoutDTO;
 import com.qbit.assets.thirdparty.internal.circle.domain.dto.PayoutPageDTO;
 import com.qbit.assets.thirdparty.internal.circle.domain.vo.PayoutVO;
 import com.qbit.assets.thirdparty.internal.okx.domain.dto.ConvertTradeDTO;
 import com.qbit.assets.thirdparty.internal.okx.domain.vo.ConvertTradeVO;
 import com.qbit.assets.thirdparty.internal.okx.domain.vo.MarketTickerVO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -18,18 +15,16 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * <p>
- * 服务实现类
- * </p>
- *
- * @author martin
- * @since 2023-02-05
+ * @author martinjiang
+ * @description AssetsOkxService
+ * @date 2023/2/16 00:39
  */
 @Service
-public class TransfersServiceImpl extends ServiceImpl<TransfersMapper, Transfers> implements TransfersService {
-
+@Slf4j
+public class AssetsOkxServiceImpl implements AssetsOkxService {
     @Override
     public ConvertTradeVO trade(ConvertTradeDTO body) {
+
         return null;
     }
 
@@ -51,6 +46,12 @@ public class TransfersServiceImpl extends ServiceImpl<TransfersMapper, Transfers
         return trades;
     }
 
+    /**
+     * 获取产品行情
+     *
+     * @param map
+     * @return
+     */
     @Override
     public List<MarketTickerVO> getTickers(Map map) {
         List<MarketTickerVO> marketTickers = new ArrayList<>();

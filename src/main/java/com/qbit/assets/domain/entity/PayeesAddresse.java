@@ -7,8 +7,8 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName("assets_payees_addresses")
-public class PayeesAddresses extends BaseV2 {
+@TableName("assets_payees_addresse")
+public class PayeesAddresse extends BaseV2 {
 
     private static final long serialVersionUID = 1L;
 

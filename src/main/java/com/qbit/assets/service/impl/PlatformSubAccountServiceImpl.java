@@ -5,14 +5,14 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.qbit.assets.common.enums.ChainType;
 import com.qbit.assets.common.enums.CryptoAssetsPlatform;
-import com.qbit.assets.domain.entity.Addresses;
+import com.qbit.assets.domain.entity.Addresse;
+import com.qbit.assets.domain.entity.CryptoAssetsTransaction;
 import com.qbit.assets.domain.entity.CurrenciesPairs;
-import com.qbit.assets.domain.entity.PlatTransactions;
 import com.qbit.assets.domain.entity.PlatformSubAccount;
 import com.qbit.assets.mapper.AddressesMapper;
 import com.qbit.assets.mapper.PlatformSubAccountMapper;
+import com.qbit.assets.service.CryptoAssetsTransactionService;
 import com.qbit.assets.service.CurrenciesPairsService;
-import com.qbit.assets.service.PlatTransactionsService;
 import com.qbit.assets.service.PlatformSubAccountService;
 import com.qbit.assets.thirdparty.internal.okx.domain.dto.CreateDepositAddressDTO;
 import com.qbit.assets.thirdparty.internal.okx.domain.dto.CreateSubAccountDTO;
@@ -45,7 +45,7 @@ public class PlatformSubAccountServiceImpl extends ServiceImpl<PlatformSubAccoun
     @Resource
     private AddressesMapper addressesMapper;
     @Resource
-    private PlatTransactionsService platTransactionsService;
+    private CryptoAssetsTransactionService cryptoAssetsTransactionService;
     @Resource
     private CurrenciesPairsService currenciesPairsService;
 
@@ -81,7 +81,7 @@ public class PlatformSubAccountServiceImpl extends ServiceImpl<PlatformSubAccoun
     @Override
     public SubAccountDepositAddressVO createDepositAddress(CreateDepositAddressDTO body) {
         SubAccountDepositAddressVO subAccountDepositAddressVO = new SubAccountDepositAddressVO();
-        Addresses addresses = new Addresses();
+        Addresse addresses = new Addresse();
         addresses.setAccountId("12306");
         addresses.setAddress(UUID.randomUUID().toString());
         addresses.setChain(ChainType.ALGO.getName());
@@ -110,10 +110,10 @@ public class PlatformSubAccountServiceImpl extends ServiceImpl<PlatformSubAccoun
     @Override
     public List<SubAccountDepositVO> subAccountDepositHistory(SubAccountDepositDTO body) {
         List<SubAccountDepositVO> subAccountDepositVOS = new ArrayList<>();
-        LambdaQueryWrapper<PlatTransactions> transactionsLambdaQueryWrapper = new LambdaQueryWrapper<>();
-        transactionsLambdaQueryWrapper.eq(PlatTransactions::getPlatform, CryptoAssetsPlatform.OKX);
-        List<PlatTransactions> list = platTransactionsService.list(transactionsLambdaQueryWrapper);
-        for (PlatTransactions platTransactions : list) {
+        LambdaQueryWrapper<CryptoAssetsTransaction> transactionsLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        transactionsLambdaQueryWrapper.eq(CryptoAssetsTransaction::getPlatform, CryptoAssetsPlatform.OKX);
+        List<CryptoAssetsTransaction> list = cryptoAssetsTransactionService.list(transactionsLambdaQueryWrapper);
+        for (CryptoAssetsTransaction platTransactions : list) {
             SubAccountDepositVO subAccountDepositVO = new SubAccountDepositVO();
             subAccountDepositVO.setAmt(platTransactions.getAmount().toString());
             subAccountDepositVO.setTxId(platTransactions.getTransactionHash());

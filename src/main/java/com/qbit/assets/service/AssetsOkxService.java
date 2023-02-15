@@ -1,7 +1,5 @@
 package com.qbit.assets.service;
 
-import com.baomidou.mybatisplus.extension.service.IService;
-import com.qbit.assets.domain.entity.Transfers;
 import com.qbit.assets.thirdparty.internal.circle.domain.dto.PayoutDTO;
 import com.qbit.assets.thirdparty.internal.circle.domain.dto.PayoutPageDTO;
 import com.qbit.assets.thirdparty.internal.circle.domain.vo.PayoutVO;
@@ -13,14 +11,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * <p>
- * 服务类
- * </p>
- *
- * @author martin
- * @since 2023-02-05
+ * @author martinjiang
+ * @description AssetsOkxService
+ * @date 2023/2/16 00:38
  */
-public interface TransfersService extends IService<Transfers> {
+public interface AssetsOkxService {
     /**
      * 闪兑交易
      *

@@ -2,7 +2,7 @@ package com.qbit.assets.mapper;
 
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.qbit.assets.domain.entity.Addresses;
+import com.qbit.assets.domain.entity.Addresse;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
@@ -14,6 +14,6 @@ import org.apache.ibatis.annotations.Mapper;
  * @since 2023-02-05
  */
 @Mapper
-public interface AddressesMapper extends BaseMapper<Addresses> {
+public interface AddressesMapper extends BaseMapper<Addresse> {
 
 }

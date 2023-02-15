@@ -2,7 +2,7 @@ package com.qbit.assets.service;
 
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.qbit.assets.domain.entity.PayeesAddresses;
+import com.qbit.assets.domain.entity.PayeesAddresse;
 
 /**
  * <p>
@@ -12,6 +12,6 @@ import com.qbit.assets.domain.entity.PayeesAddresses;
  * @author martin
  * @since 2023-02-05
  */
-public interface PayeesAddressesService extends IService<PayeesAddresses> {
+public interface PayeesAddressesService extends IService<PayeesAddresse> {
 
 }
