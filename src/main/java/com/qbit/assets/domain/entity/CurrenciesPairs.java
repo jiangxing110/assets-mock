@@ -1,6 +1,7 @@
 package com.qbit.assets.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.qbit.assets.common.enums.CryptoConversionCurrencyEnum;
 import com.qbit.assets.domain.base.BaseV2;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -23,7 +24,7 @@ public class CurrenciesPairs extends BaseV2 {
     /**
      * 交易货币币种，如 BTC-USDT中的BTC
      */
-    private String baseCurrency;
+    private CryptoConversionCurrencyEnum baseCurrency;
 
     /**
      * 交易货币支持的最小值
@@ -38,7 +39,7 @@ public class CurrenciesPairs extends BaseV2 {
     /**
      * 计价货币币种，如 BTC-USDT中的USDT
      */
-    private String quoteCurrency;
+    private CryptoConversionCurrencyEnum quoteCurrency;
 
     /**
      * 计价货币支持的最小值

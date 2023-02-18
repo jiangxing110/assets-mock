@@ -1,6 +1,8 @@
 package com.qbit.assets.thirdparty.internal.okx.domain.dto;
 
 
+import com.qbit.assets.common.enums.CryptoAssetsTransferAction;
+import com.qbit.assets.common.enums.CryptoConversionCurrencyEnum;
 import com.qbit.assets.thirdparty.internal.okx.annotation.ITag;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -24,19 +26,19 @@ public class ConvertEstimateQuoteDTO extends BaseDTO implements ITag {
     /**
      * 交易货币币种，如 BTC-USDT中的BTC
      */
-    private String baseCcy;
+    private CryptoConversionCurrencyEnum baseCcy;
 
     /**
      * 计价货币币种，如 BTC-USDT中的USDT
      */
-    private String quoteCcy;
+    private CryptoConversionCurrencyEnum quoteCcy;
 
     /**
      * 交易方向
      * 买：buy 卖：sell
      * 描述的是对于baseCcy的交易方向
      */
-    private String side;
+    private CryptoAssetsTransferAction side;
 
     /**
      * 询价数量
@@ -46,7 +48,7 @@ public class ConvertEstimateQuoteDTO extends BaseDTO implements ITag {
     /**
      * 询价币种
      */
-    private String rfqSzCcy;
+    private CryptoConversionCurrencyEnum rfqSzCcy;
 
     /**
      * 客户端自定义的订单标识

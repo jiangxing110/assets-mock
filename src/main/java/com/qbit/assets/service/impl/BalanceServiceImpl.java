@@ -4,6 +4,7 @@ package com.qbit.assets.service.impl;
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.qbit.assets.common.enums.BalanceColumnTypeEnum;
 import com.qbit.assets.common.enums.SpecialUUID;
 import com.qbit.assets.common.error.CustomException;
 import com.qbit.assets.common.utils.RedisLockUtil;
@@ -15,6 +16,7 @@ import com.qbit.assets.thirdparty.internal.circle.domain.vo.BalanceVO;
 import com.qbit.assets.thirdparty.internal.okx.domain.vo.AssetsBalanceVO;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -92,6 +94,46 @@ public class BalanceServiceImpl extends ServiceImpl<BalanceMapper, Balance> impl
         //return getValidated(id, null);
     }
 
+    @Override
+    @Transactional(propagation = Propagation.MANDATORY)
+    public Balance checkBalanceAmountWithError(String balanceId, BigDecimal amount, BalanceColumnTypeEnum column) {
+        var balance = this.checkBalance(balanceId);
+        var verified = this.checkBalanceAmount(balanceId, amount, column);
+        if (!verified) {
+            throw new CustomException("insufficient amount");
+        }
+        return balance;
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.MANDATORY, rollbackFor = Throwable.class)
+    public boolean checkBalanceAmount(String balanceId, BigDecimal amount, BalanceColumnTypeEnum column) {
+        var resFlag = false;
+        var balance = balanceMapper.selectById(balanceId);
+        if (column == BalanceColumnTypeEnum.Available) {
+            var res = balance.getAvailable().subtract(amount);
+            if (res.compareTo(BigDecimal.ZERO) >= 0) {
+                // Available >= amount
+                resFlag = true;
+            }
+        } else if (column == BalanceColumnTypeEnum.Pending) {
+            var res = balance.getPending().subtract(amount);
+            if (res.compareTo(BigDecimal.ZERO) >= 0) {
+                // Pending >= amount
+                resFlag = true;
+            }
+        } else if (column == BalanceColumnTypeEnum.Frozen) {
+            var res = balance.getPending().subtract(amount);
+            if (res.compareTo(BigDecimal.ZERO) >= 0) {
+                // Frozen >= amount
+                resFlag = true;
+            }
+        } else {
+            throw new CustomException("column is error", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return resFlag;
+    }
+
 
     @Override
     @Transactional(propagation = Propagation.MANDATORY)
@@ -146,7 +188,7 @@ public class BalanceServiceImpl extends ServiceImpl<BalanceMapper, Balance> impl
         if (CollectionUtil.isNotEmpty(balances)) {
             assetsBalances = balances.stream().map(e -> {
                 AssetsBalanceVO assetsBalanceVO = new AssetsBalanceVO();
-                assetsBalanceVO.setCcy(e.getCurrency());
+                assetsBalanceVO.setCcy(e.getCurrency().getValue());
                 assetsBalanceVO.setBal(e.getAvailable().toString());
                 assetsBalanceVO.setAvailBal(e.getAvailable().toString());
                 assetsBalanceVO.setFrozenBal(e.getFrozen().setScale(2, BigDecimal.ROUND_HALF_UP).toString());
@@ -166,7 +208,7 @@ public class BalanceServiceImpl extends ServiceImpl<BalanceMapper, Balance> impl
         if (CollectionUtil.isNotEmpty(balances)) {
             List<BalanceVO> available = balances.stream().map(e -> {
                 BalanceVO balanceVO = new BalanceVO();
-                balanceVO.setCurrency(e.getCurrency());
+                balanceVO.setCurrency(e.getCurrency().getValue());
                 balanceVO.setAmount(e.getAvailable().toString());
                 return balanceVO;
             }).collect(Collectors.toList());

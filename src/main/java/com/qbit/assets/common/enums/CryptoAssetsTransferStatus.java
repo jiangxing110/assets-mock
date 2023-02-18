@@ -10,26 +10,7 @@ import lombok.Getter;
 
 @Getter
 public enum CryptoAssetsTransferStatus implements IEnum<String> {
-    /**
-     * 未知
-     */
-    Na("Na"),
-    /**
-     * 待判断
-     */
-    ToBeJudged("ToBeJudged"),
-    /**
-     * 待合规补录
-     */
-    ToBeSupplementedByCompliance("ToBeSupplementedByCompliance"),
-    /**
-     * 待用户补录
-     */
-    ToBeSupplementedByUser("ToBeSupplementedByUser"),
-    /**
-     * 待复审
-     */
-    Reexamine("Reexamine"),
+
     /**
      * 等待合规审核
      */
@@ -66,22 +47,5 @@ public enum CryptoAssetsTransferStatus implements IEnum<String> {
             }
         }
         return null;
-    }
-
-    public static CryptoAssetsTransferStatus valueOf(TransactionStatusEnum status) {
-        switch (status) {
-            case Closed -> {
-                return Closed;
-            }
-            case Pending -> {
-                return Processing;
-            }
-            case ToBeSupplementedByUser -> {
-                return ToBeSupplementedByUser;
-            }
-            default -> {
-                return Cancelled;
-            }
-        }
     }
 }

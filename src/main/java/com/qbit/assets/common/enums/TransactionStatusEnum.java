@@ -22,12 +22,8 @@ public enum TransactionStatusEnum implements IEnum<String> {
     /**
      * 失败
      */
-    Fail("Fail"),
+    Fail("Fail");
 
-    /**
-     * 待用户补录
-     */
-    ToBeSupplementedByUser("ToBeSupplementedByUser");
 
     @JsonValue
     public final String value;
@@ -55,7 +51,6 @@ public enum TransactionStatusEnum implements IEnum<String> {
         return switch (status) {
             case Closed -> Closed;
             case Rejected, Cancelled -> Fail;
-            case ToBeSupplementedByUser -> ToBeSupplementedByUser;
             default -> Pending;
         };
     }

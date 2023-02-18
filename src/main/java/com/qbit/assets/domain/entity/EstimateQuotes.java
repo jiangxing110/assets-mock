@@ -1,6 +1,8 @@
 package com.qbit.assets.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.qbit.assets.common.enums.CryptoAssetsTransferAction;
+import com.qbit.assets.common.enums.CryptoConversionCurrencyEnum;
 import com.qbit.assets.domain.base.BaseV2;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -23,7 +25,7 @@ public class EstimateQuotes extends BaseV2 {
     /**
      * 交易币
      */
-    private String baseCurrency;
+    private CryptoConversionCurrencyEnum baseCurrency;
 
     /**
      * 交易币数量
@@ -33,7 +35,7 @@ public class EstimateQuotes extends BaseV2 {
     /**
      * 计价币
      */
-    private String quoteCurrency;
+    private CryptoConversionCurrencyEnum quoteCurrency;
 
     /**
      * 计价币数量
@@ -43,7 +45,7 @@ public class EstimateQuotes extends BaseV2 {
     /**
      * 交易方向(买：buy 卖：sell)
      */
-    private String side;
+    private CryptoAssetsTransferAction side;
 
     /**
      * 汇率
@@ -63,7 +65,7 @@ public class EstimateQuotes extends BaseV2 {
     /**
      * 询价币种
      */
-    private String rfqCurrency;
+    private CryptoConversionCurrencyEnum rfqCurrency;
 
     /**
      * 原始汇率

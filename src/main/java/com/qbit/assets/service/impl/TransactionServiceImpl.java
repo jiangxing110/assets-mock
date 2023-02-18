@@ -470,7 +470,7 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
         // 保存其他信息
         LambdaUpdateWrapper<Transaction> updateWrapper = new LambdaUpdateWrapper<>();
         updateWrapper.eq(Transaction::getId, transaction.getId())
-                .set(Transaction::getType, TransactionTypeEnum.UnFrozen)
+                .set(Transaction::getType, TransactionTypeEnum.Unfrozen)
                 .set(Transaction::getStatus, TransactionStatusEnum.Closed)
                 .set(Transaction::getDisplayStatus, TransactionDisplayStatusEnum.Closed);
         this.update(updateWrapper);

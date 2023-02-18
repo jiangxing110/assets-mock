@@ -1,6 +1,7 @@
 package com.qbit.assets.domain.vo;
 
 import com.qbit.assets.common.enums.ChainType;
+import com.qbit.assets.common.enums.CounterpartyType;
 import com.qbit.assets.common.enums.CryptoConversionCurrencyEnum;
 import lombok.Data;
 

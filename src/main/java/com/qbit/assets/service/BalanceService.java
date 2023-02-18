@@ -1,6 +1,7 @@
 package com.qbit.assets.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.qbit.assets.common.enums.BalanceColumnTypeEnum;
 import com.qbit.assets.domain.entity.Balance;
 import com.qbit.assets.domain.vo.AccountBalanceVO;
 import com.qbit.assets.thirdparty.internal.okx.domain.vo.AssetsBalanceVO;
@@ -32,6 +33,10 @@ public interface BalanceService extends IService<Balance> {
 
     boolean balanceSubFrozenAmount(String balanceId, BigDecimal amount);
 
+
+    Balance checkBalanceAmountWithError(String balanceId, BigDecimal amount, BalanceColumnTypeEnum column);
+
+    boolean checkBalanceAmount(String balanceId, BigDecimal amount, BalanceColumnTypeEnum column);
 
     /**
      * 获取经过验证的balance实体

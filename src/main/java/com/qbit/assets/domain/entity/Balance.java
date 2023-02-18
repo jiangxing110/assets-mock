@@ -1,6 +1,8 @@
 package com.qbit.assets.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.qbit.assets.common.enums.CryptoConversionCurrencyEnum;
+import com.qbit.assets.common.enums.WalletTypeEnum;
 import com.qbit.assets.domain.base.BaseV2;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -26,9 +28,9 @@ public class Balance extends BaseV2 {
 
     private String accountId;
 
-    private String walletType;
+    private WalletTypeEnum walletType;
 
-    private String currency;
+    private CryptoConversionCurrencyEnum currency;
 
     private BigDecimal available;
 

@@ -1,5 +1,6 @@
 package com.qbit.assets.thirdparty.internal.okx.domain.vo;
 
+import com.qbit.assets.common.enums.CryptoConversionCurrencyEnum;
 import lombok.Data;
 
 import java.io.Serial;
@@ -26,7 +27,7 @@ public class ConvertCurrencyPairVO implements Serializable {
     /**
      * 交易货币币种，如 BTC-USDT中的BTC
      */
-    private String baseCcy;
+    private CryptoConversionCurrencyEnum baseCcy;
 
     /**
      * 交易货币支持闪兑的最大值
@@ -41,7 +42,7 @@ public class ConvertCurrencyPairVO implements Serializable {
     /**
      * 计价货币币种，如 BTC-USDT中的USDT
      */
-    private String quoteCcy;
+    private CryptoConversionCurrencyEnum quoteCcy;
 
     /**
      * 计价货币支持闪兑的最大值

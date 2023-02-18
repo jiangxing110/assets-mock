@@ -86,14 +86,12 @@ public class CryptoAssetsTransfer extends BaseV2 {
     /**
      * 交易状态
      */
-    private String displayStatus;
+    private TransactionStatusEnum displayStatus;
 
     /**
      * 交易发起方币种
      */
     private CryptoConversionCurrencyEnum quoteCurrency;
-
-    private String businessTypeDetail;
 
     /**
      * 发送方类型
@@ -115,15 +113,6 @@ public class CryptoAssetsTransfer extends BaseV2 {
      */
     private String reason;
 
-    /**
-     * 最新处理人
-     */
-    private String handleUserId;
-
-    /**
-     * 对手方
-     */
-    private String counterParty;
 
     private String rawData;
 
@@ -138,13 +127,6 @@ public class CryptoAssetsTransfer extends BaseV2 {
      * 退款来源的交易ID(transaction display id)
      */
     private String relatedQbitTxId;
-
-    /**
-     * 交易手续费加点
-     */
-    private BigDecimal fee2;
-
-    private Date closeTime;
 
     /**
      * 对商户端隐藏(admin可以查看)

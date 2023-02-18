@@ -1,5 +1,7 @@
 package com.qbit.assets.thirdparty.internal.okx.domain.vo;
 
+import com.qbit.assets.common.enums.CryptoAssetsTransferAction;
+import com.qbit.assets.common.enums.CryptoConversionCurrencyEnum;
 import lombok.Data;
 
 import java.io.Serial;
@@ -41,18 +43,18 @@ public class ConvertEstimateQuoteVO implements Serializable {
     /**
      * 交易货币币种，如 BTC-USDT 中BTC
      */
-    private String baseCcy;
+    private CryptoConversionCurrencyEnum baseCcy;
 
     /**
      * 计价货币币种，如 BTC-USDT 中USDT
      */
-    private String quoteCcy;
+    private CryptoConversionCurrencyEnum quoteCcy;
 
     /**
      * 交易方向
      * 买：buy 卖：sell
      */
-    private String side;
+    private CryptoAssetsTransferAction side;
 
     /**
      * 原始报价的数量
@@ -67,7 +69,7 @@ public class ConvertEstimateQuoteVO implements Serializable {
     /**
      * 报价的币种
      */
-    private String rfqSzCcy;
+    private CryptoConversionCurrencyEnum rfqSzCcy;
 
     /**
      * 闪兑价格，单位为计价币
