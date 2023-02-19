@@ -86,6 +86,7 @@ public class CircleServiceImpl implements CircleService {
         total = total.add(fee);
 
         transaction.setTotalAmount(total);
+        //设置pending
         transaction.setStatus(data.getStatus());
         ChainType chain = data.getDestination().getChain();
         if (chain == null) {

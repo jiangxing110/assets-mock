@@ -5,6 +5,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.qbit.assets.common.enums.BalanceColumnTypeEnum;
+import com.qbit.assets.common.enums.CryptoConversionCurrencyEnum;
 import com.qbit.assets.common.enums.SpecialUUID;
 import com.qbit.assets.common.error.CustomException;
 import com.qbit.assets.common.utils.RedisLockUtil;
@@ -15,6 +16,7 @@ import com.qbit.assets.service.BalanceService;
 import com.qbit.assets.thirdparty.internal.circle.domain.vo.BalanceVO;
 import com.qbit.assets.thirdparty.internal.okx.domain.vo.AssetsBalanceVO;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.redisson.api.RLock;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -198,11 +200,14 @@ public class BalanceServiceImpl extends ServiceImpl<BalanceMapper, Balance> impl
     }
 
     @Override
-    public AccountBalanceVO getCircleBalances() {
+    public AccountBalanceVO getCircleBalances(String ccy) {
         LambdaQueryWrapper<Balance> balanceLambdaQueryWrapper = new LambdaQueryWrapper<>();
         AccountBalanceVO assetsBalances = new AccountBalanceVO();
         balanceLambdaQueryWrapper.eq(Balance::getAccountId, SpecialUUID.NullUUID.value());
         balanceLambdaQueryWrapper.eq(Balance::getWalletType, "CircleWallet");
+        if (StringUtils.isNotBlank(ccy)) {
+            balanceLambdaQueryWrapper.eq(Balance::getCurrency, CryptoConversionCurrencyEnum.getItem(ccy));
+        }
         List<Balance> balances = balanceMapper.selectList(balanceLambdaQueryWrapper);
         if (CollectionUtil.isNotEmpty(balances)) {
             List<BalanceVO> available = balances.stream().map(e -> {

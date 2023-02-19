@@ -69,7 +69,7 @@ public class CircleController {
     @ApiOperation(value = "获取主账户余额")
     @GetMapping("/v1/balance")
     public ResponseEntity<AccountBalanceVO> getBalances() {
-        AccountBalanceVO balances = balanceService.getCircleBalances();
+        AccountBalanceVO balances = balanceService.getCircleBalances(null);
         return ResponseEntity.ok(balances);
     }
 

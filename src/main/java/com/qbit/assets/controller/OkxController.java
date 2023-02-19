@@ -155,23 +155,25 @@ public class OkxController {
         return R.ok(depositVo);
     }
 
-
-/*
-
-
     @ApiOperation(value = "提现")
     @PostMapping(ASSETS + "withdrawal")
     public ResponseEntity<WithdrawalVO> withdrawal(WithdrawalDTO body) {
-        WithdrawalVO withdrawalVO = subAccountService.withdrawal(body);
+        WithdrawalVO withdrawalVO = okxService.withdrawal(body);
         return ResponseEntity.ok(withdrawalVO);
     }
 
     @ApiOperation(value = "提现列表")
     @GetMapping(ASSETS + "withdrawal")
     public ResponseEntity<List<WithdrawalHistoryVO>> getWithdrawals(Map<String, Object> params) {
-        List<WithdrawalHistoryVO> withdrawalHistorys = subAccountService.getWithdrawals(body);
+        List<WithdrawalHistoryVO> withdrawalHistorys = okxService.getWithdrawals(params);
         return ResponseEntity.ok(withdrawalHistorys);
     }
+/*
+
+
+
+
+
 
     @ApiOperation(value = "查询当前币种的充值地址")
     @GetMapping(ASSETS + "withdrawal")

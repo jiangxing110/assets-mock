@@ -41,4 +41,9 @@ public class AssetTransferDto implements Serializable {
      * 三方业务id
      */
     private String tradeId;
+
+    /**
+     * 三方业务id
+     */
+    private String payeeId;
 }

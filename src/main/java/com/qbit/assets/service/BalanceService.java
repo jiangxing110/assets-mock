@@ -78,5 +78,5 @@ public interface BalanceService extends IService<Balance> {
      */
     List<AssetsBalanceVO> getOkxBalances(String[] ccy, String walletType, String accountId);
 
-    AccountBalanceVO getCircleBalances();
+    AccountBalanceVO getCircleBalances(String ccy);
 }

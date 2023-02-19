@@ -73,13 +73,11 @@ public class CryptoAssetsTransactionServiceImpl extends ServiceImpl<CryptoAssets
             // 生成transfer审核订单
             transfer = transferService.transferIn(entity);
         }
-
         // 退款
         if (sourceType == CircleWalletTypeEnum.WIRE && destinationType == CircleWalletTypeEnum.WALLET) {
             // 生成transfer审核订单
             transfer = transferService.handleReturn(entity);
         }
-
         // 转出到外部
         if (sourceType == CircleWalletTypeEnum.WALLET && destinationType != CircleWalletTypeEnum.WALLET) {
             // transfer表需要同步状态

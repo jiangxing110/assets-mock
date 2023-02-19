@@ -132,6 +132,9 @@ public class CryptoAssetsTransferServiceImpl extends ServiceImpl<CryptoAssetsTra
         BigDecimal fee = body.getFee();
         transfer = transfer(balance.getId(), settlementAmount, fee, type, BalanceOperationEnum.Sub, body.getTradeId(), transfer.getId());
         transfer.setStatus(status);
+        if (StringUtils.isNotBlank(body.getPayeeId())) {
+            transfer.setPayeeId(body.getPayeeId());
+        }
         this.updateById(transfer);
         return transfer;
     }
@@ -349,7 +352,6 @@ public class CryptoAssetsTransferServiceImpl extends ServiceImpl<CryptoAssetsTra
         transfer.setSenderType(CounterpartyType.WALLET);
         transfer.setRecipientType(CounterpartyType.CHAIN);
         transfer.setCurrency(balance.getCurrency());
-        //transfer.setPayeeId(params.getDestination().getPayeeId());
         // 创建变动钱的订单
         BalanceChangeDTO dto = new BalanceChangeDTO();
         dto.setBalanceId(balance.getId());
