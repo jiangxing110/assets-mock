@@ -24,7 +24,7 @@ public interface BalanceMapper extends BaseMapper<Balance> {
      * @param id
      * @return
      */
-    @Select(value = "select * from balance t where t.id = #{id} for update")
+    @Select(value = "select * from assets_balance t where t.id = #{id} for update")
     Balance findBalanceByIdForUpdate(String id);
 
     /**
@@ -34,7 +34,7 @@ public interface BalanceMapper extends BaseMapper<Balance> {
      * @param cost
      * @return
      */
-    @Update(value = "update balance SET available = available - #{cost}, version = version + 1, \"updateTime\" = CURRENT_TIMESTAMP WHERE id = #{id} and available >= #{cost}")
+    @Update(value = "update assets_balance SET available = available - #{cost}, version = version + 1, update_time = CURRENT_TIMESTAMP WHERE id = #{id} and available >= #{cost}")
     int subBalanceAvailable(@Param("id") String id, @Param("cost") BigDecimal cost);
 
     /**
@@ -44,7 +44,7 @@ public interface BalanceMapper extends BaseMapper<Balance> {
      * @param cost
      * @return
      */
-    @Update(value = "update balance SET available = available + #{cost}, version = version + 1 , \"updateTime\" = CURRENT_TIMESTAMP WHERE id = #{id}")
+    @Update(value = "update assets_balance SET available = available + #{cost}, version = version + 1 , update_time = CURRENT_TIMESTAMP WHERE id = #{id}")
     int addBalanceAvailable(@Param("id") String id, @Param("cost") BigDecimal cost);
 
     /**
@@ -54,7 +54,7 @@ public interface BalanceMapper extends BaseMapper<Balance> {
      * @param cost
      * @return
      */
-    @Update(value = "update balance SET pending = pending - #{cost}, version = version + 1 , \"updateTime\" = CURRENT_TIMESTAMP WHERE id = #{id} and pending >= #{cost}")
+    @Update(value = "update assets_balance SET pending = pending - #{cost}, version = version + 1 , update_time = CURRENT_TIMESTAMP WHERE id = #{id} and pending >= #{cost}")
     int subBalancePending(@Param("id") String id, @Param("cost") BigDecimal cost);
 
     /**
@@ -64,7 +64,7 @@ public interface BalanceMapper extends BaseMapper<Balance> {
      * @param cost
      * @return
      */
-    @Update(value = "update balance SET pending = pending + #{cost}, version = version + 1 , \"updateTime\" = CURRENT_TIMESTAMP WHERE id = #{id}")
+    @Update(value = "update assets_balance SET pending = pending + #{cost}, version = version + 1 , update_time = CURRENT_TIMESTAMP WHERE id = #{id}")
     int addBalancePending(@Param("id") String id, @Param("cost") BigDecimal cost);
 
     /**
@@ -74,7 +74,7 @@ public interface BalanceMapper extends BaseMapper<Balance> {
      * @param cost
      * @return
      */
-    @Update(value = "update balance SET frozen = frozen - #{cost}, version = version + 1 , \"updateTime\" = CURRENT_TIMESTAMP WHERE id = #{id} and frozen >= #{cost}")
+    @Update(value = "update assets_balance SET frozen = frozen - #{cost}, version = version + 1 , update_time = CURRENT_TIMESTAMP WHERE id = #{id} and frozen >= #{cost}")
     int subBalanceFrozen(@Param("id") String id, @Param("cost") BigDecimal cost);
 
     /**
@@ -84,7 +84,7 @@ public interface BalanceMapper extends BaseMapper<Balance> {
      * @param cost
      * @return
      */
-    @Update(value = "update balance SET frozen = frozen + #{cost}, version = version + 1 , \"updateTime\" = CURRENT_TIMESTAMP WHERE id = #{id}")
+    @Update(value = "update assets_balance SET frozen = frozen + #{cost}, version = version + 1 , update_time = CURRENT_TIMESTAMP WHERE id = #{id}")
     int addBalanceFrozen(String id, BigDecimal cost);
 
     /**
@@ -104,5 +104,5 @@ public interface BalanceMapper extends BaseMapper<Balance> {
      */
     List<Balance> balanceChart();
 
-    
+
 }

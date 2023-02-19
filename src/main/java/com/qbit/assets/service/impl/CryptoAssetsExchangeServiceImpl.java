@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
@@ -48,6 +49,8 @@ public class CryptoAssetsExchangeServiceImpl implements CryptoAssetsExchangeServ
     private EstimateQuotesService estimateQuoteService;
     @Resource
     private EstimateQuotesMapper estimateQuotesMapper;
+    @Resource
+    private CryptoAssetsTradeService cryptoAssetsTradeService;
 
 
     /**
@@ -205,6 +208,7 @@ public class CryptoAssetsExchangeServiceImpl implements CryptoAssetsExchangeServ
      * 闪兑交易
      */
     @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public AssetsTransferVo trade(AssetExchangeDto body) {
         AssetsTransferVo transferVo = new AssetsTransferVo();
         // 原始金额
@@ -248,18 +252,14 @@ public class CryptoAssetsExchangeServiceImpl implements CryptoAssetsExchangeServ
         EstimateQuotes estimateQuote = checkEstimateQuote(fromBalance.getCurrency(), toBalance.getCurrency(), amount.subtract(slipDotFee), quoteId);
         // 构建处理中的卖单
         CryptoAssetsTransfer transfer = this.createSellTransfer(SpecialUUID.NullUUID.value(), fromBalance, amount.add(fee), fee, toBalance.getCurrency());
-
         // 记录询价id
         Map<String, String> rawData = new HashMap<>(2);
         rawData.put("quoteId", UUID.randomUUID().toString());
         transfer.setRawData(JsonUtil.toJSONString(rawData));
-
         // 请求三方完成交易
         TradeVO vo = trade(transfer, estimateQuote);
-
         CryptoAssetsTrade trade = buildTrade(transfer.getAccountId(), fromBalance.getCurrency(), fee, fromBalance.getCurrency(), slipDotFee, estimateQuote, vo, transfer.getId());
-
-        //tradeService.save(trade);
+        cryptoAssetsTradeService.save(trade);
         // 构建买单
         amount = vo.getFinalBaseSz();
         if (vo.getQuoteCcy().equals(toBalance.getCurrency().getValue())) {

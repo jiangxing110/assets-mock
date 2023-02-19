@@ -18,13 +18,12 @@ public class BalanceTransaction extends BaseV2 {
 
     private static final long serialVersionUID = 1L;
 
-    @TableField(value = "\"accountId\"")
+
     private String accountId;
 
-    @TableField(value = "\"sourceType\"")
     private String sourceType;
 
-    @TableField(value = "\"sourceId\"")
+
     private String sourceId;
 
     private TransactionStatusEnum type;
@@ -51,7 +50,6 @@ public class BalanceTransaction extends BaseV2 {
 
     private CryptoConversionCurrencyEnum recipientCurrency;
 
-    @TableField(value = "\"recipientFee\"")
     private BigDecimal recipientFee;
 
     private String recipientFeeType;
@@ -72,6 +70,6 @@ public class BalanceTransaction extends BaseV2 {
 
     @TableField(select = false, typeHandler = JsonbTypeHandler.class)
     private Object sqlExecuteList;
-    @TableField(value = "remarks")
+
     private String remarks;
 }

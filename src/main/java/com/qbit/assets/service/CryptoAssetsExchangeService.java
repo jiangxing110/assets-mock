@@ -45,8 +45,14 @@ public interface CryptoAssetsExchangeService {
      */
     CryptoAssetsTransfer buildTransfer(CryptoAssetsTransferAction action, Transaction transaction);
 
+    /**
+     * 闪兑交易
+     */
     AssetsTransferVo trade(AssetExchangeDto body);
 
+    /**
+     * 闪兑交易
+     */
     CryptoAssetsTransfer convert(Balance fromBalance, Balance toBalance, BigDecimal amount, BigDecimal fee, String quoteId);
 
 

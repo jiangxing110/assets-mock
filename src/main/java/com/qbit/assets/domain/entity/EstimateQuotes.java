@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName("assets_estimate_quotes")
+@TableName("assets_estimate_quote")
 public class EstimateQuotes extends BaseV2 {
 
     private static final long serialVersionUID = 1L;

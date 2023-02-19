@@ -16,11 +16,19 @@ import java.math.BigDecimal;
  * @author martinjiang
  */
 public interface CryptoAssetsTransferService extends IService<CryptoAssetsTransfer> {
-
+    /**
+     * 充值
+     */
     CryptoAssetsTransfer deposit(AssetTransferDto body);
 
+    /**
+     * 提现
+     */
     CryptoAssetsTransfer withdraw(AssetTransferDto body);
 
+    /**
+     * 转入转出审批
+     */
     CryptoAssetsTransfer review(String transferId, CryptoAssetsTransferStatus status);
 
     /**

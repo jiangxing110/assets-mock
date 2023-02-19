@@ -3,7 +3,6 @@ package com.qbit.assets.domain.dto;
 import com.qbit.assets.common.enums.TransactionTypeEnum;
 import lombok.Data;
 
-import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
@@ -41,6 +40,5 @@ public class AssetTransferDto implements Serializable {
     /**
      * 三方业务id
      */
-    @NotEmpty(message = "tradeId cannot be empty")
     private String tradeId;
 }

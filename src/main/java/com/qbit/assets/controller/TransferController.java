@@ -42,7 +42,7 @@ public class TransferController {
 
     @ApiOperation(value = "交易审核")
     @PostMapping("review")
-    public R review(@RequestParam(value = "ccy") String transferId, @RequestParam(value = "status") CryptoAssetsTransferStatus status) {
+    public R review(@RequestParam(value = "transferId") String transferId, @RequestParam(value = "status") CryptoAssetsTransferStatus status) {
         CryptoAssetsTransfer reviewVo = transferService.review(transferId, status);
         return R.ok(reviewVo);
     }

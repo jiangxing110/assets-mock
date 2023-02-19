@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName("assets_currencies_pairs")
+@TableName("assets_currencies_pair")
 public class CurrenciesPairs extends BaseV2 {
 
     private static final long serialVersionUID = 1L;

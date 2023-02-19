@@ -139,7 +139,6 @@ public class BalanceServiceImpl extends ServiceImpl<BalanceMapper, Balance> impl
     @Transactional(propagation = Propagation.MANDATORY)
     public Balance checkBalance(String balanceId) {
         var balance = balanceMapper.selectById(balanceId);
-        //var balance = balanceMapper.findBalanceByIdForUpdate(balanceId);
         if (balance == null) {
             throw new CustomException("balanceId is null");
         }

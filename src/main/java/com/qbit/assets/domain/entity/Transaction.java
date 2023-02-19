@@ -1,6 +1,5 @@
 package com.qbit.assets.domain.entity;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.qbit.assets.common.enums.CryptoConversionCurrencyEnum;
 import com.qbit.assets.common.enums.TransactionDisplayStatusEnum;
@@ -56,17 +55,14 @@ public class Transaction extends BaseV2 {
      */
     private String recipientType;
 
+    /**
+     * 目标的余额id
+     */
     private String recipientBalanceId;
     /**
      * 源币种
      */
     private CryptoConversionCurrencyEnum senderCurrency;
-
-    /**
-     * 目标的余额id
-     */
-    @TableField("recipient_balanceId")
-    private String recipientBalanceid;
 
     /**
      * 目标币种

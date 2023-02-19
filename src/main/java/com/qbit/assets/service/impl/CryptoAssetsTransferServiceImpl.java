@@ -15,7 +15,9 @@ import com.qbit.assets.service.BalanceService;
 import com.qbit.assets.service.CryptoAssetsTransferService;
 import com.qbit.assets.service.TransactionService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
@@ -46,6 +48,7 @@ public class CryptoAssetsTransferServiceImpl extends ServiceImpl<CryptoAssetsTra
      * 转入转出审批
      */
     @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public CryptoAssetsTransfer review(String transferId, CryptoAssetsTransferStatus status) {
         CryptoAssetsTransfer oldTransfer = this.getById(transferId);
         CryptoAssetsTransferStatus oldStatus = oldTransfer.getStatus();
@@ -66,12 +69,15 @@ public class CryptoAssetsTransferServiceImpl extends ServiceImpl<CryptoAssetsTra
      * 充值
      */
     @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public CryptoAssetsTransfer deposit(AssetTransferDto body) {
-        var wrapper = new LambdaQueryWrapper<CryptoAssetsTransfer>();
-        wrapper.eq(CryptoAssetsTransfer::getTradeId, body.getTradeId());
-        var cryptoAssetsTransferDb = this.getOne(wrapper);
-        if (cryptoAssetsTransferDb != null) {
-            throw new CustomException("订单已存在");
+        if (StringUtils.isNotBlank(body.getTradeId())) {
+            var wrapper = new LambdaQueryWrapper<CryptoAssetsTransfer>();
+            wrapper.eq(CryptoAssetsTransfer::getTradeId, body.getTradeId());
+            var cryptoAssetsTransferDb = this.getOne(wrapper);
+            if (cryptoAssetsTransferDb != null) {
+                throw new CustomException("订单已存在");
+            }
         }
         Balance balance = balanceService.getById(body.getInBalanceId());
         CryptoAssetsTransfer transfer = new CryptoAssetsTransfer();
@@ -95,12 +101,15 @@ public class CryptoAssetsTransferServiceImpl extends ServiceImpl<CryptoAssetsTra
      * 提现
      */
     @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
     public CryptoAssetsTransfer withdraw(AssetTransferDto body) {
-        var wrapper = new LambdaQueryWrapper<CryptoAssetsTransfer>();
-        wrapper.eq(CryptoAssetsTransfer::getTradeId, body.getTradeId());
-        var cryptoAssetsTransferDb = this.getOne(wrapper);
-        if (cryptoAssetsTransferDb != null) {
-            throw new CustomException("订单已存在");
+        if (StringUtils.isNotBlank(body.getTradeId())) {
+            var wrapper = new LambdaQueryWrapper<CryptoAssetsTransfer>();
+            wrapper.eq(CryptoAssetsTransfer::getTradeId, body.getTradeId());
+            var cryptoAssetsTransferDb = this.getOne(wrapper);
+            if (cryptoAssetsTransferDb != null) {
+                throw new CustomException("订单已存在");
+            }
         }
         Balance balance = balanceService.getById(body.getOutBalanceId());
         CryptoAssetsTransfer transfer = new CryptoAssetsTransfer();
