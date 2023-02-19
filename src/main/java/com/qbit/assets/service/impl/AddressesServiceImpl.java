@@ -41,6 +41,9 @@ public class AddressesServiceImpl extends ServiceImpl<AddressesMapper, Addresse>
     @Resource
     private BalanceService balanceService;
 
+    /**
+     * 根据钱包ID获取地址
+     */
     @Override
     public List<AddressVO> getAddresses(String walletId) {
         List<AddressVO> addressVOS = new ArrayList<>();
@@ -60,6 +63,9 @@ public class AddressesServiceImpl extends ServiceImpl<AddressesMapper, Addresse>
         return addressVOS;
     }
 
+    /**
+     * 创建钱包地址
+     */
     @Override
     public AddressVO createAddress(String walletId, AddressDTO body) {
         AddressVO addressVO = new AddressVO();
@@ -76,10 +82,9 @@ public class AddressesServiceImpl extends ServiceImpl<AddressesMapper, Addresse>
         return addressVO;
     }
 
+
     /**
-     * @param chain
-     * @param destinationAddress
-     * @return
+     * 更加地址获取钱包
      */
     @Override
     public Balance getBalanceByAddress(ChainType chain, String destinationAddress) {
@@ -88,9 +93,9 @@ public class AddressesServiceImpl extends ServiceImpl<AddressesMapper, Addresse>
         addressesLambdaQueryWrapper.eq(Addresse::getAddress, destinationAddress);
         addressesLambdaQueryWrapper.eq(Addresse::getChain, chain);
         addressesLambdaQueryWrapper.last("limit 1");
-        Addresse addresses = this.getOne(addressesLambdaQueryWrapper);
-        if (addresses != null) {
-            balance = balanceService.getById(addresses.getWalletId());
+        List<Addresse> addresses = this.list(addressesLambdaQueryWrapper);
+        if (CollectionUtil.isNotEmpty(addresses)) {
+            balance = balanceService.getById(addresses.get(0).getWalletId());
         }
         return balance;
     }

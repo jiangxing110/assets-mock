@@ -7,7 +7,6 @@ import com.qbit.assets.domain.entity.CryptoAssetsTransaction;
 import com.qbit.assets.domain.entity.CryptoAssetsTransfer;
 import com.qbit.assets.service.CircleService;
 import com.qbit.assets.service.CryptoAssetsTransactionService;
-import com.qbit.assets.service.CryptoAssetsTransferService;
 import com.qbit.assets.thirdparty.internal.circle.domain.bo.AmountBO;
 import com.qbit.assets.thirdparty.internal.circle.domain.vo.TransferVO;
 import com.qbit.assets.thirdparty.internal.circle.enums.CircleTransactionStatusEnum;
@@ -32,9 +31,6 @@ public class CircleServiceImpl implements CircleService {
 
     @Resource
     private CryptoAssetsTransactionService cryptoAssetsTransactionService;
-    @Resource
-    private CryptoAssetsTransferService cryptoAssetsTransferService;
-
 
     /**
      * @param body
@@ -50,14 +46,6 @@ public class CircleServiceImpl implements CircleService {
         return handleTransaction(transaction);
     }
 
-    /**
-     * @param body
-     * @return
-     */
-    @Override
-    public CryptoAssetsTransfer chainWithdraw(TransferVO body) {
-        return null;
-    }
 
     private CryptoAssetsTransfer handleTransaction(CryptoAssetsTransaction transaction) {
         CryptoAssetsTransfer transfer;

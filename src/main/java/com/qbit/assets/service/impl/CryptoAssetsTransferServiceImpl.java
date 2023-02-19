@@ -9,6 +9,7 @@ import com.qbit.assets.common.error.CustomException;
 import com.qbit.assets.common.utils.JsonUtil;
 import com.qbit.assets.domain.dto.AssetTransferDto;
 import com.qbit.assets.domain.dto.BalanceChangeDTO;
+import com.qbit.assets.domain.dto.CryptoAssetsTransferDTO;
 import com.qbit.assets.domain.entity.Balance;
 import com.qbit.assets.domain.entity.CryptoAssetsTransaction;
 import com.qbit.assets.domain.entity.CryptoAssetsTransfer;
@@ -28,10 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import static com.qbit.assets.common.enums.CryptoAssetsTransferStatus.*;
 
@@ -157,7 +155,8 @@ public class CryptoAssetsTransferServiceImpl extends ServiceImpl<CryptoAssetsTra
         }
         CryptoConversionCurrencyEnum currency = entity.getCurrency();
         //
-        currency = currency == CryptoConversionCurrencyEnum.USD ? CryptoConversionCurrencyEnum.USDC : currency;
+        currency = entity.getCurrency();
+        //currency == CryptoConversionCurrencyEnum.USD ? CryptoConversionCurrencyEnum.USDC : currency;
         String id = UUID.randomUUID().toString();
 
         BigDecimal amount = entity.getAmount();
@@ -301,6 +300,73 @@ public class CryptoAssetsTransferServiceImpl extends ServiceImpl<CryptoAssetsTra
         return transfer;
     }
 
+    /**
+     * @param entity
+     * @return
+     */
+    @Override
+    public CryptoAssetsTransfer hook(CryptoAssetsTransaction entity) {
+        return null;
+    }
+
+    /**
+     * 转出到链上
+     *
+     * @param params {@link CryptoAssetsTransferDTO}
+     * @return true/false
+     */
+    @Transactional
+    public CryptoAssetsTransfer transferToChain(CryptoAssetsTransferDTO params) {
+        BigDecimal amount = BigDecimal.valueOf(params.getAmount());
+        Balance exist = balanceService.getById(params.getFromBalanceId());
+        List<WalletTypeEnum> wallets = Arrays.asList(WalletTypeEnum.CircleWallet, WalletTypeEnum.OkxWallet);
+        if (!wallets.contains(exist.getWalletType())) {
+            throw new CustomException("当前钱包不支持");
+        }
+        ChainType chain = params.getChain();
+        // 交易手续费默认为0
+        BigDecimal fee = new BigDecimal("0.08");
+        //withdrawalService.getFee(exist, chain);
+        BigDecimal settleAmount = amount.add(fee);
+        // 检查钱包和金额
+        Balance balance = balanceService.checkBalanceAmountWithError(params.getFromBalanceId(), settleAmount, BalanceColumnTypeEnum.Available);
+        // 验证三方提币限额
+        //withdrawalService.verifyQuota(balance, chain, settleAmount);
+        // 创建USDC交易订单
+        CryptoAssetsTransfer transfer = new CryptoAssetsTransfer();
+        transfer.setId(UUID.randomUUID().toString());
+        transfer.setBalanceId(params.getFromBalanceId());
+        transfer.setAction(CryptoAssetsTransferAction.OUT);
+        transfer.setChain(chain);
+        transfer.setAddress(params.getToAddress());
+        transfer.setSettlementAmount(amount);
+        transfer.setAccountId(balance.getAccountId());
+        transfer.setOriginAmount(settleAmount);
+        transfer.setFee(fee);
+        transfer.setStatus(Processing);
+        transfer.setDisplayStatus(TransactionStatusEnum.Pending);
+        transfer.setQuoteCurrency(balance.getCurrency());
+        transfer.setSenderType(CounterpartyType.WALLET);
+        transfer.setRecipientType(CounterpartyType.CHAIN);
+        transfer.setCurrency(balance.getCurrency());
+        //transfer.setPayeeId(params.getDestination().getPayeeId());
+        // 创建变动钱的订单
+        BalanceChangeDTO dto = new BalanceChangeDTO();
+        dto.setBalanceId(balance.getId());
+        dto.setCurrency(balance.getCurrency());
+        dto.setAccountId(balance.getAccountId());
+        dto.setFee(fee);
+        dto.setCost(amount);
+        dto.setSourceId(transfer.getId());
+        dto.setOperation(BalanceOperationEnum.Sub);
+        dto.setType(TransactionTypeEnum.CryptoAssetsTransferOut);
+        dto.setSourceType(TransactionSourceTypeEnum.QbitCrypto);
+        Transaction transaction = transactionService.singleBalanceSubAmountToPendingV2(dto);
+        transfer.setTransactionId(transaction.getId());
+        this.save(transfer);
+        return transfer;
+    }
+
 
     /**
      * 获取前端显示状态
@@ -390,14 +456,6 @@ public class CryptoAssetsTransferServiceImpl extends ServiceImpl<CryptoAssetsTra
         return params;
     }
 
-    /**
-     * @param entity
-     * @return
-     */
-    @Override
-    public CryptoAssetsTransfer hook(CryptoAssetsTransaction entity) {
-        return null;
-    }
 
     private void mappingType(TransactionTypeEnum type, CryptoAssetsTransfer transfer) {
         CounterpartyType senderType = CounterpartyType.WALLET;

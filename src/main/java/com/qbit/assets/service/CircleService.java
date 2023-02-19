@@ -14,9 +14,5 @@ public interface CircleService {
      * 链上充值
      */
     CryptoAssetsTransfer chainDeposit(TransferVO body);
-
-    /**
-     * 链上提现
-     */
-    CryptoAssetsTransfer chainWithdraw(TransferVO body);
+    
 }

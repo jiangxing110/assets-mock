@@ -1,6 +1,7 @@
 package com.qbit.assets.controller;
 
 import com.qbit.assets.common.utils.R;
+import com.qbit.assets.domain.dto.CryptoAssetsTransferDTO;
 import com.qbit.assets.domain.entity.CryptoAssetsTransfer;
 import com.qbit.assets.domain.vo.AccountBalanceVO;
 import com.qbit.assets.service.*;
@@ -33,6 +34,8 @@ import java.util.Map;
 public class CircleController {
     @Resource
     private CircleSDKService circleSDKService;
+    @Resource
+    private CryptoAssetsTransferService cryptoAssetsTransferService;
     @Resource
     private PayeesService payeesService;
     @Resource
@@ -93,8 +96,8 @@ public class CircleController {
 
     @ApiOperation(value = "ciricle链上提现")
     @PostMapping("/chain/withdraw")
-    public R withdraw(@RequestBody TransferVO body) {
-        CryptoAssetsTransfer withdrawVo = circleService.chainWithdraw(body);
+    public R withdraw(@RequestBody CryptoAssetsTransferDTO body) {
+        CryptoAssetsTransfer withdrawVo = cryptoAssetsTransferService.transferToChain(body);
         return R.ok(withdrawVo);
     }
 

@@ -149,7 +149,7 @@ public class OkxController {
     }
 
     @ApiOperation(value = "ciricle链上充值")
-    @PostMapping("/chain/deposit")
+    @PostMapping("/okx/deposit")
     public R deposit(@RequestBody SubAccountDepositVO body) {
         CryptoAssetsTransfer depositVo = okxService.chainDeposit(body);
         return R.ok(depositVo);

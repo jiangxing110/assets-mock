@@ -5,6 +5,7 @@ import com.qbit.assets.common.enums.BalanceOperationEnum;
 import com.qbit.assets.common.enums.CryptoAssetsTransferStatus;
 import com.qbit.assets.domain.dto.AssetTransferDto;
 import com.qbit.assets.domain.dto.BalanceChangeDTO;
+import com.qbit.assets.domain.dto.CryptoAssetsTransferDTO;
 import com.qbit.assets.domain.entity.Balance;
 import com.qbit.assets.domain.entity.CryptoAssetsTransaction;
 import com.qbit.assets.domain.entity.CryptoAssetsTransfer;
@@ -28,6 +29,11 @@ public interface CryptoAssetsTransferService extends IService<CryptoAssetsTransf
     CryptoAssetsTransfer withdraw(AssetTransferDto body);
 
     /**
+     * 转出到链上
+     */
+    CryptoAssetsTransfer transferToChain(CryptoAssetsTransferDTO params);
+
+    /**
      * 转入(通过hook完成)
      */
     CryptoAssetsTransfer transferIn(CryptoAssetsTransaction entity);
@@ -36,7 +42,9 @@ public interface CryptoAssetsTransferService extends IService<CryptoAssetsTransf
      * 退款
      */
     CryptoAssetsTransfer handleReturn(CryptoAssetsTransaction entity);
-    
+
+    CryptoAssetsTransfer hook(CryptoAssetsTransaction entity);
+
 
     /**
      * 转入转出审批
@@ -61,6 +69,4 @@ public interface CryptoAssetsTransferService extends IService<CryptoAssetsTransf
      * @return params
      */
     BalanceChangeDTO buildTransferDTO(Balance balance, BigDecimal amount, BigDecimal fee, BalanceOperationEnum operation);
-
-    CryptoAssetsTransfer hook(CryptoAssetsTransaction entity);
 }

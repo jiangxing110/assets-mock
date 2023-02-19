@@ -13,6 +13,7 @@ import com.qbit.assets.thirdparty.internal.circle.enums.CircleWalletTypeEnum;
 import com.qbit.assets.thirdparty.internal.okx.domain.vo.SubAccountDepositVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -30,10 +31,10 @@ public class OkxServiceImpl implements OkxService {
     private CryptoAssetsTransactionService transactionService;
 
     /**
-     * @param body
-     * @return
+     * 链上充值
      */
     @Override
+    @Transactional
     public CryptoAssetsTransfer chainDeposit(SubAccountDepositVO body) {
         CryptoAssetsTransaction transaction = this.convert(body);
         return this.handleTransaction(transaction, body);
@@ -69,7 +70,8 @@ public class OkxServiceImpl implements OkxService {
         return transaction;
     }
 
-    private CryptoAssetsTransfer handleTransaction(CryptoAssetsTransaction transaction, SubAccountDepositVO depositVo) {
+    @Transactional
+    public CryptoAssetsTransfer handleTransaction(CryptoAssetsTransaction transaction, SubAccountDepositVO depositVo) {
         CryptoAssetsTransaction record = transactionService.getByTradeId(transaction.getTradeId());
         boolean result;
         if (record != null) {

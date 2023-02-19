@@ -18,10 +18,18 @@ import java.util.List;
  * @since 2023-02-05
  */
 public interface AddressesService extends IService<Addresse> {
-
+    /**
+     * 根据钱包ID获取地址
+     */
     List<AddressVO> getAddresses(String walletId);
 
+    /**
+     * 创建钱包地址
+     */
     AddressVO createAddress(String walletId, AddressDTO body);
 
+    /**
+     * 更加地址获取钱包
+     */
     Balance getBalanceByAddress(ChainType chain, String destinationAddress);
 }

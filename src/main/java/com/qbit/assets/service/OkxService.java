@@ -9,5 +9,8 @@ import com.qbit.assets.thirdparty.internal.okx.domain.vo.SubAccountDepositVO;
  * @date 2023/2/19 15:49
  */
 public interface OkxService {
+    /**
+     * 链上充值
+     */
     CryptoAssetsTransfer chainDeposit(SubAccountDepositVO body);
 }
