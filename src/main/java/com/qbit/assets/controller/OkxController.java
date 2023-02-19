@@ -1,5 +1,7 @@
 package com.qbit.assets.controller;
 
+import com.qbit.assets.common.utils.R;
+import com.qbit.assets.domain.entity.CryptoAssetsTransfer;
 import com.qbit.assets.service.*;
 import com.qbit.assets.thirdparty.internal.okx.domain.dto.*;
 import com.qbit.assets.thirdparty.internal.okx.domain.vo.*;
@@ -40,7 +42,7 @@ public class OkxController {
     @Resource
     private EstimateQuotesService estimateQuotesService;
     @Resource
-    private CryptoAssetsTransferService cryptoAssetsTransferService;
+    private OkxService okxService;
     @Resource
     private AssetsOkxService assetsOkxService;
 
@@ -146,7 +148,12 @@ public class OkxController {
         return ResponseEntity.ok(tickerVO);
     }
 
-
+    @ApiOperation(value = "ciricle链上充值")
+    @PostMapping("/chain/deposit")
+    public R deposit(@RequestBody SubAccountDepositVO body) {
+        CryptoAssetsTransfer depositVo = okxService.chainDeposit(body);
+        return R.ok(depositVo);
+    }
 
 
 /*

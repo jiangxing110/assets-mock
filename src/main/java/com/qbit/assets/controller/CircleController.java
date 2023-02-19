@@ -1,10 +1,9 @@
 package com.qbit.assets.controller;
 
+import com.qbit.assets.common.utils.R;
+import com.qbit.assets.domain.entity.CryptoAssetsTransfer;
 import com.qbit.assets.domain.vo.AccountBalanceVO;
-import com.qbit.assets.service.AddressesService;
-import com.qbit.assets.service.AssetsOkxService;
-import com.qbit.assets.service.BalanceService;
-import com.qbit.assets.service.PayeesService;
+import com.qbit.assets.service.*;
 import com.qbit.assets.thirdparty.internal.circle.domain.dto.AddressDTO;
 import com.qbit.assets.thirdparty.internal.circle.domain.dto.BankWireDTO;
 import com.qbit.assets.thirdparty.internal.circle.domain.dto.PayoutDTO;
@@ -42,6 +41,9 @@ public class CircleController {
     private AddressesService addressesService;
     @Resource
     private AssetsOkxService assetsOkxService;
+    @Resource
+    private CircleService circleService;
+
 
     @ApiOperation(value = "健康检查")
     @GetMapping("/ping")
@@ -82,9 +84,19 @@ public class CircleController {
         return ResponseEntity.ok(address);
     }
 
-    //@ApiOperation(value = "ciricle链上充值")
-    //@ApiOperation(value = "ciricle链上提现")
+    @ApiOperation(value = "ciricle链上充值")
+    @PostMapping("/chain/deposit")
+    public R deposit(@RequestBody TransferVO body) {
+        CryptoAssetsTransfer depositVo = circleService.chainDeposit(body);
+        return R.ok(depositVo);
+    }
 
+    @ApiOperation(value = "ciricle链上提现")
+    @PostMapping("/chain/withdraw")
+    public R withdraw(@RequestBody TransferVO body) {
+        CryptoAssetsTransfer withdrawVo = circleService.chainWithdraw(body);
+        return R.ok(withdrawVo);
+    }
 
     @ApiOperation(value = "创建电汇银行账户")
     @PostMapping("/v1/banks/wires")

@@ -48,4 +48,18 @@ public enum CryptoAssetsTransferStatus implements IEnum<String> {
         }
         return null;
     }
+
+    public static CryptoAssetsTransferStatus valueOf(TransactionStatusEnum status) {
+        switch (status) {
+            case Closed -> {
+                return Closed;
+            }
+            case Pending -> {
+                return Processing;
+            }
+            default -> {
+                return Cancelled;
+            }
+        }
+    }
 }

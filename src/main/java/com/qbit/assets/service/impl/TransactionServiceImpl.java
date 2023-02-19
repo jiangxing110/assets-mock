@@ -59,6 +59,7 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
     @Resource
     private RedisLockUtil redisLockUtil;
 
+    
     /**
      * 更新订单
      *
@@ -457,12 +458,10 @@ public class TransactionServiceImpl extends ServiceImpl<TransactionMapper, Trans
         if (balanceObj == null || !balanceObj.getCurrency().equals(transaction.getSenderCurrency())) {
             throw new CustomException("id is Error", HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
         // 单钱包加钱
         var cost = params.getCost();
         var fee = params.getFee() == null ? BigDecimal.valueOf(0.00) : params.getFee();
         var amount = cost.subtract(fee);
-
         // 减frozen，加 Available
         balanceService.balanceSubFrozenAmount(params.getBalanceId(), amount);
         balanceService.balanceAddAvailableAmount(params.getBalanceId(), amount);

@@ -4,11 +4,14 @@ package com.qbit.assets.service.impl;
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.qbit.assets.common.enums.ChainType;
 import com.qbit.assets.common.enums.CryptoConversionCurrencyEnum;
 import com.qbit.assets.common.enums.SpecialUUID;
 import com.qbit.assets.domain.entity.Addresse;
+import com.qbit.assets.domain.entity.Balance;
 import com.qbit.assets.mapper.AddressesMapper;
 import com.qbit.assets.service.AddressesService;
+import com.qbit.assets.service.BalanceService;
 import com.qbit.assets.thirdparty.internal.circle.domain.dto.AddressDTO;
 import com.qbit.assets.thirdparty.internal.circle.domain.vo.AddressVO;
 import com.qbit.assets.thirdparty.internal.circle.service.CircleSDKService;
@@ -35,7 +38,8 @@ public class AddressesServiceImpl extends ServiceImpl<AddressesMapper, Addresse>
 
     @Resource
     private CircleSDKService sdk;
-
+    @Resource
+    private BalanceService balanceService;
 
     @Override
     public List<AddressVO> getAddresses(String walletId) {
@@ -70,5 +74,24 @@ public class AddressesServiceImpl extends ServiceImpl<AddressesMapper, Addresse>
         this.save(addresses);
         BeanUtils.copyProperties(addresses, addressVO);
         return addressVO;
+    }
+
+    /**
+     * @param chain
+     * @param destinationAddress
+     * @return
+     */
+    @Override
+    public Balance getBalanceByAddress(ChainType chain, String destinationAddress) {
+        Balance balance = new Balance();
+        LambdaQueryWrapper<Addresse> addressesLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        addressesLambdaQueryWrapper.eq(Addresse::getAddress, destinationAddress);
+        addressesLambdaQueryWrapper.eq(Addresse::getChain, chain);
+        addressesLambdaQueryWrapper.last("limit 1");
+        Addresse addresses = this.getOne(addressesLambdaQueryWrapper);
+        if (addresses != null) {
+            balance = balanceService.getById(addresses.getWalletId());
+        }
+        return balance;
     }
 }

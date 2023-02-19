@@ -3,17 +3,23 @@ package com.qbit.assets.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.fasterxml.jackson.databind.JavaType;
 import com.qbit.assets.common.enums.*;
 import com.qbit.assets.common.error.CustomException;
+import com.qbit.assets.common.utils.JsonUtil;
 import com.qbit.assets.domain.dto.AssetTransferDto;
 import com.qbit.assets.domain.dto.BalanceChangeDTO;
 import com.qbit.assets.domain.entity.Balance;
+import com.qbit.assets.domain.entity.CryptoAssetsTransaction;
 import com.qbit.assets.domain.entity.CryptoAssetsTransfer;
 import com.qbit.assets.domain.entity.Transaction;
 import com.qbit.assets.mapper.CryptoAssetsTransferMapper;
+import com.qbit.assets.service.AddressesService;
 import com.qbit.assets.service.BalanceService;
 import com.qbit.assets.service.CryptoAssetsTransferService;
 import com.qbit.assets.service.TransactionService;
+import com.qbit.assets.thirdparty.internal.circle.domain.bo.AmountBO;
+import com.qbit.assets.thirdparty.internal.circle.enums.CircleTransactionStatusEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -22,9 +28,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
-import static com.qbit.assets.common.enums.CryptoAssetsTransferStatus.Pending;
-import static com.qbit.assets.common.enums.CryptoAssetsTransferStatus.Processing;
+import static com.qbit.assets.common.enums.CryptoAssetsTransferStatus.*;
 
 /**
  * <p>
@@ -37,12 +46,12 @@ import static com.qbit.assets.common.enums.CryptoAssetsTransferStatus.Processing
 @Service
 @Slf4j
 public class CryptoAssetsTransferServiceImpl extends ServiceImpl<CryptoAssetsTransferMapper, CryptoAssetsTransfer> implements CryptoAssetsTransferService {
-
     @Resource
     private BalanceService balanceService;
-
     @Resource
     private TransactionService transactionService;
+    @Resource
+    private AddressesService addressesService;
 
     /**
      * 转入转出审批
@@ -129,6 +138,192 @@ public class CryptoAssetsTransferServiceImpl extends ServiceImpl<CryptoAssetsTra
         return transfer;
     }
 
+    /**
+     * @param entity
+     * @return
+     */
+    @Override
+    public CryptoAssetsTransfer transferIn(CryptoAssetsTransaction entity) {
+        //根据address获取balance
+        Balance balance = addressesService.getBalanceByAddress(entity.getChain(), entity.getDestinationAddress());
+        if (balance == null) {
+            log.info("qbit系统没找到对应的钱包: {}", entity.getTradeId());
+            return null;
+        }
+        CryptoAssetsTransfer record = getByTradeId(entity.getTradeId());
+        if (record != null && record.getDisplayStatus() != TransactionStatusEnum.Pending) {
+            log.info("已经处理完成的订单: {}", entity.getTradeId());
+            return null;
+        }
+        CryptoConversionCurrencyEnum currency = entity.getCurrency();
+        //
+        currency = currency == CryptoConversionCurrencyEnum.USD ? CryptoConversionCurrencyEnum.USDC : currency;
+        String id = UUID.randomUUID().toString();
+
+        BigDecimal amount = entity.getAmount();
+
+        BigDecimal fee = BigDecimal.ZERO;
+        //inFee(entity.getAmount(), CryptoConversionCurrencyEnum.USDC, wallet.getAccountId());
+        if (fee.compareTo(amount) > 0) {
+            fee = amount;
+            amount = BigDecimal.ZERO;
+        } else {
+            amount = amount.subtract(fee);
+        }
+        String balanceId = balance.getId();
+        // 创建变动钱的订单
+        BalanceChangeDTO params = new BalanceChangeDTO();
+        params.setBalanceId(balance.getId());
+        params.setCurrency(currency);
+        params.setAccountId(balance.getAccountId());
+        params.setCost(amount);
+        params.setSourceId(id);
+        params.setSourceType(TransactionSourceTypeEnum.QbitCrypto);
+        params.setOperation(BalanceOperationEnum.Add);
+        params.setType(TransactionTypeEnum.CryptoAssetsTransferIn);
+        params.setSourceType(TransactionSourceTypeEnum.QbitCrypto);
+        Transaction transaction = this.transactionService.singleBalanceAddAmountToPendingV2(params);
+
+        if (entity.getStatus() == CircleTransactionStatusEnum.COMPLETE) {
+            // 完成订单
+            transaction = transactionService.updateBalanceByBalanceTransactionIdV2(transaction.getId(), TransactionStatusEnum.Closed);
+        } else {
+            transaction = transactionService.updateBalanceByBalanceTransactionIdV2(transaction.getId(), TransactionStatusEnum.Fail);
+        }
+        // 创建USDC入金订单
+        CryptoAssetsTransfer transfer = new CryptoAssetsTransfer();
+        transfer.setId(id);
+        transfer.setBalanceId(balanceId);
+        transfer.setTradeId(entity.getTradeId());
+        transfer.setAction(CryptoAssetsTransferAction.IN);
+        transfer.setChain(entity.getChain());
+        transfer.setSettlementAmount(amount);
+        transfer.setFee(fee);
+        transfer.setStatus(valueOf(transaction.getStatus()));
+        transfer.setCurrency(currency);
+        transfer.setQuoteCurrency(currency);
+        transfer.setAccountId(balance.getAccountId());
+        transfer.setOriginAmount(amount.add(fee));
+        transfer.setTransactionId(transaction.getId());
+
+        transfer.setSenderType(CounterpartyType.CHAIN);
+        transfer.setRecipientType(CounterpartyType.WALLET);
+        transfer.setTransactionTime(entity.getCreateTime());
+        transfer.setDisplayStatus(transaction.getStatus());
+        // 完成订单落库
+        this.save(transfer);
+        return transfer;
+    }
+
+    /**
+     * @param entity
+     * @return
+     */
+    @Override
+    public CryptoAssetsTransfer handleReturn(CryptoAssetsTransaction entity) {
+        String balanceId = entity.getDestinationId();
+        Balance balance = balanceService.checkBalance(balanceId);
+        CryptoAssetsTransfer record = getByTradeId(entity.getTradeId());
+        if (record != null && record.getDisplayStatus() != TransactionStatusEnum.Pending) {
+            log.info("已经处理完成的订单: {}", entity.getTradeId());
+            return null;
+        }
+
+        LambdaQueryWrapper<CryptoAssetsTransfer> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(CryptoAssetsTransfer::getTradeId, entity.getSourceId()).eq(CryptoAssetsTransfer::getAction, CryptoAssetsTransferAction.OUT).last("LIMIT 1");
+        CryptoAssetsTransfer transferOut = this.getOne(wrapper);
+        if (transferOut == null) {
+            log.info("找不到关联支出订单:\n{}", entity);
+            return null;
+        }
+        Transaction transactionOut = transactionService.getById(transferOut.getTransactionId());
+        if (transactionOut == null) {
+            log.info("找不到关联支出订单的transaction记录:\n{}", transactionOut);
+            return null;
+        }
+        String id = UUID.randomUUID().toString();
+
+        BigDecimal amount = entity.getAmount();
+
+        if (transferOut.getSettlementAmount().compareTo(amount) < 0) {
+            log.warn("退款金额超出支出金额:\n{}\n{}", transferOut, entity);
+            return null;
+        }
+
+        BigDecimal fee = entity.getFee();
+
+        if (fee.compareTo(amount) > 0) {
+            fee = amount;
+            amount = BigDecimal.ZERO;
+        } else {
+            amount = amount.subtract(fee);
+        }
+        // 创建变动钱的订单
+        BalanceChangeDTO params = new BalanceChangeDTO();
+        params.setBalanceId(balanceId);
+        params.setCurrency(balance.getCurrency());
+        params.setAccountId(transferOut.getAccountId());
+        params.setCost(amount);
+        params.setSourceId(id);
+        params.setSourceType(TransactionSourceTypeEnum.QbitCrypto);
+        params.setOperation(BalanceOperationEnum.Add);
+        params.setType(TransactionTypeEnum.CryptoAssetsTransferIn);
+        params.setSourceType(TransactionSourceTypeEnum.QbitCrypto);
+        Transaction transaction = this.transactionService.singleBalanceAddAmountToPendingV2(params);
+        if (entity.getStatus() == CircleTransactionStatusEnum.COMPLETE) {
+            // 完成订单
+            transaction = transactionService.updateBalanceByBalanceTransactionIdV2(transaction.getId(), TransactionStatusEnum.Closed);
+        } else {
+            transaction = transactionService.updateBalanceByBalanceTransactionIdV2(transaction.getId(), TransactionStatusEnum.Fail);
+        }
+        CryptoAssetsTransfer transfer = new CryptoAssetsTransfer();
+        transfer.setId(id);
+        transfer.setBalanceId(balanceId);
+        transfer.setTradeId(entity.getTradeId());
+        transfer.setAction(CryptoAssetsTransferAction.REFUND);
+        transfer.setChain(entity.getChain());
+        transfer.setSettlementAmount(amount);
+        transfer.setFee(fee);
+        transfer.setStatus(valueOf(transaction.getStatus()));
+        transfer.setCurrency(transferOut.getQuoteCurrency());
+        transfer.setQuoteCurrency(transferOut.getCurrency());
+        transfer.setAccountId(transferOut.getAccountId());
+        transfer.setOriginAmount(amount.add(fee));
+        transfer.setTransactionId(transaction.getId());
+
+        transfer.setSenderType(CounterpartyType.WIRE);
+        transfer.setRecipientType(CounterpartyType.WALLET);
+        transfer.setTransactionTime(entity.getCreateTime());
+        transfer.setDisplayStatus(transaction.getStatus());
+        transfer.setRelatedQbitTxId(transactionOut.getTransactionDisplayId());
+        // 完成订单落库
+        this.save(transfer);
+        return transfer;
+    }
+
+
+    /**
+     * 获取前端显示状态
+     *
+     * @param status status
+     * @return new status
+     */
+    private TransactionStatusEnum setDisplayStatusAction(CryptoAssetsTransferStatus status) {
+        if (status.equals(Closed)) {
+            return TransactionStatusEnum.Closed;
+        } else if (status.equals(Cancelled)) {
+            return TransactionStatusEnum.Fail;
+        } else {
+            return TransactionStatusEnum.Pending;
+        }
+    }
+
+    private CryptoAssetsTransfer getByTradeId(String tradeId) {
+        LambdaQueryWrapper<CryptoAssetsTransfer> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(CryptoAssetsTransfer::getTradeId, tradeId).last("LIMIT 1");
+        return this.getOne(wrapper);
+    }
+
     @Transactional(rollbackFor = Throwable.class)
     public CryptoAssetsTransfer transfer(String balanceId, BigDecimal amount, BigDecimal fee, TransactionTypeEnum type, BalanceOperationEnum operation, String tradeId, String id) {
         BigDecimal totalAmount = amount.add(fee);
@@ -195,6 +390,15 @@ public class CryptoAssetsTransferServiceImpl extends ServiceImpl<CryptoAssetsTra
         return params;
     }
 
+    /**
+     * @param entity
+     * @return
+     */
+    @Override
+    public CryptoAssetsTransfer hook(CryptoAssetsTransaction entity) {
+        return null;
+    }
+
     private void mappingType(TransactionTypeEnum type, CryptoAssetsTransfer transfer) {
         CounterpartyType senderType = CounterpartyType.WALLET;
         CounterpartyType recipientType = CounterpartyType.WALLET;
@@ -251,5 +455,26 @@ public class CryptoAssetsTransferServiceImpl extends ServiceImpl<CryptoAssetsTra
         return transfer;
     }
 
-
+    /**
+     * 处理fee, circle 那边会更改数据结构
+     *
+     * @param data circle fee数据
+     * @return {@link List<AmountBO>}
+     */
+    private List<AmountBO> getFees(Object data) {
+        List<AmountBO> fees = new ArrayList<>();
+        if (data instanceof Map<?, ?>) {
+            AmountBO fee = JsonUtil.toBean(data, AmountBO.class);
+            if (fee != null) {
+                fees.add(fee);
+            }
+        } else if (data instanceof List<?>) {
+            JavaType javaType = JsonUtil.getCollectionType(List.class, AmountBO.class);
+            List<AmountBO> list = JsonUtil.toBean(JsonUtil.toJSONString(data), javaType);
+            if (list != null) {
+                fees.addAll(list);
+            }
+        }
+        return fees;
+    }
 }
