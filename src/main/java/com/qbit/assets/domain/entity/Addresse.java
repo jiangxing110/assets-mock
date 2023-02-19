@@ -1,6 +1,8 @@
 package com.qbit.assets.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.qbit.assets.common.enums.ChainType;
+import com.qbit.assets.common.enums.CryptoAssetsPlatform;
 import com.qbit.assets.domain.base.BaseV2;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,7 +31,7 @@ public class Addresse extends BaseV2 {
     /**
      * 链
      */
-    private String chain;
+    private ChainType chain;
 
     /**
      * 币种
@@ -61,5 +63,9 @@ public class Addresse extends BaseV2 {
      */
     private Boolean selected;
 
+    /**
+     * 平台
+     */
+    private CryptoAssetsPlatform platform;
 
 }

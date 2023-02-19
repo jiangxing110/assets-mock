@@ -5,12 +5,13 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.qbit.assets.common.enums.ChainType;
 import com.qbit.assets.common.enums.CryptoAssetsPlatform;
-import com.qbit.assets.domain.entity.Addresse;
-import com.qbit.assets.domain.entity.CryptoAssetsTransaction;
-import com.qbit.assets.domain.entity.CurrenciesPairs;
-import com.qbit.assets.domain.entity.PlatformSubAccount;
+import com.qbit.assets.common.enums.CryptoConversionCurrencyEnum;
+import com.qbit.assets.common.enums.SpecialUUID;
+import com.qbit.assets.common.utils.OkxUtil;
+import com.qbit.assets.domain.entity.*;
 import com.qbit.assets.mapper.AddressesMapper;
 import com.qbit.assets.mapper.PlatformSubAccountMapper;
+import com.qbit.assets.service.BalanceService;
 import com.qbit.assets.service.CryptoAssetsTransactionService;
 import com.qbit.assets.service.CurrenciesPairsService;
 import com.qbit.assets.service.PlatformSubAccountService;
@@ -48,6 +49,8 @@ public class PlatformSubAccountServiceImpl extends ServiceImpl<PlatformSubAccoun
     private CryptoAssetsTransactionService cryptoAssetsTransactionService;
     @Resource
     private CurrenciesPairsService currenciesPairsService;
+    @Resource
+    private BalanceService balanceService;
 
     @Override
     public SubAccountVO createSubAccount(CreateSubAccountDTO body) {
@@ -81,12 +84,18 @@ public class PlatformSubAccountServiceImpl extends ServiceImpl<PlatformSubAccoun
     @Override
     public SubAccountDepositAddressVO createDepositAddress(CreateDepositAddressDTO body) {
         SubAccountDepositAddressVO subAccountDepositAddressVO = new SubAccountDepositAddressVO();
+        Balance balance = balanceService.getCurrcyBalance(SpecialUUID.NullUUID.value, CryptoConversionCurrencyEnum.getItem(body.getCcy()));
         Addresse addresses = new Addresse();
-        addresses.setAccountId("12306");
+        String chain = body.getChain();
+        String[] chains = chain.split("-");
+        chain = chains[1];
+        ChainType chainType = OkxUtil.convertChain(chain);
+        addresses.setAccountId(balance.getAccountId());
         addresses.setAddress(UUID.randomUUID().toString());
-        addresses.setChain(ChainType.ALGO.getName());
+        addresses.setChain(chainType);
         addresses.setCurrency(body.getCcy());
-        addresses.setWalletId("12306");
+        addresses.setWalletId(balance.getId());
+        addresses.setPlatform(CryptoAssetsPlatform.OKX);
         addressesMapper.insert(addresses);
 
         BeanUtils.copyProperties(addresses, subAccountDepositAddressVO);

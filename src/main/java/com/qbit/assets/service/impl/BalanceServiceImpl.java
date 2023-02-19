@@ -176,6 +176,21 @@ public class BalanceServiceImpl extends ServiceImpl<BalanceMapper, Balance> impl
         return this.balanceMapper.findBalanceByIdForUpdate(id);
     }
 
+    /**
+     * @param accountId
+     * @param currency
+     * @return
+     */
+    @Override
+    public Balance getCurrcyBalance(String accountId, CryptoConversionCurrencyEnum currency) {
+        LambdaQueryWrapper<Balance> balanceLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        balanceLambdaQueryWrapper.eq(Balance::getAccountId, SpecialUUID.NullUUID.value());
+        balanceLambdaQueryWrapper.eq(Balance::getWalletType, "OkxWallet");
+        balanceLambdaQueryWrapper.last("limit 1");
+        Balance balances = balanceMapper.selectOne(balanceLambdaQueryWrapper);
+        return balances;
+    }
+
     @Override
     public List<AssetsBalanceVO> getOkxBalances(String[] ccys, String walletType, String accountId) {
         LambdaQueryWrapper<Balance> balanceLambdaQueryWrapper = new LambdaQueryWrapper<>();
