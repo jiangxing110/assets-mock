@@ -3,6 +3,7 @@ package com.qbit.assets.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.qbit.assets.common.enums.BalanceColumnTypeEnum;
 import com.qbit.assets.common.enums.CryptoConversionCurrencyEnum;
+import com.qbit.assets.common.enums.WalletTypeEnum;
 import com.qbit.assets.domain.entity.Balance;
 import com.qbit.assets.domain.vo.AccountBalanceVO;
 import com.qbit.assets.thirdparty.internal.okx.domain.vo.AssetsBalanceVO;
@@ -77,7 +78,7 @@ public interface BalanceService extends IService<Balance> {
     /**
      * 根据币种获取主钱包
      */
-    Balance getCurrcyBalance(String accountId, CryptoConversionCurrencyEnum currency);
+    Balance getCurrcyBalance(String accountId, WalletTypeEnum walletType, CryptoConversionCurrencyEnum currency);
 
     /**
      * 根据钱包类型币种获取钱包列表

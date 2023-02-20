@@ -1,12 +1,10 @@
 package com.qbit.assets.service.impl;
 
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.qbit.assets.common.enums.ChainType;
-import com.qbit.assets.common.enums.CryptoAssetsPlatform;
-import com.qbit.assets.common.enums.CryptoConversionCurrencyEnum;
-import com.qbit.assets.common.enums.SpecialUUID;
+import com.qbit.assets.common.enums.*;
 import com.qbit.assets.common.utils.OkxUtil;
 import com.qbit.assets.domain.entity.*;
 import com.qbit.assets.mapper.AddressesMapper;
@@ -15,6 +13,8 @@ import com.qbit.assets.service.BalanceService;
 import com.qbit.assets.service.CryptoAssetsTransactionService;
 import com.qbit.assets.service.CurrenciesPairsService;
 import com.qbit.assets.service.PlatformSubAccountService;
+import com.qbit.assets.thirdparty.internal.circle.enums.CircleTransactionStatusEnum;
+import com.qbit.assets.thirdparty.internal.circle.enums.CircleWalletTypeEnum;
 import com.qbit.assets.thirdparty.internal.okx.domain.dto.CreateDepositAddressDTO;
 import com.qbit.assets.thirdparty.internal.okx.domain.dto.CreateSubAccountDTO;
 import com.qbit.assets.thirdparty.internal.okx.domain.dto.SubAccountDepositDTO;
@@ -52,6 +52,12 @@ public class PlatformSubAccountServiceImpl extends ServiceImpl<PlatformSubAccoun
     @Resource
     private BalanceService balanceService;
 
+    /**
+     * 创建子账户
+     *
+     * @param body
+     * @return
+     */
     @Override
     public SubAccountVO createSubAccount(CreateSubAccountDTO body) {
         SubAccountVO subAccountVO = okxBrokerService.createSubAccount(body);
@@ -64,6 +70,12 @@ public class PlatformSubAccountServiceImpl extends ServiceImpl<PlatformSubAccoun
         return subAccountVO;
     }
 
+    /**
+     * 创建子账户apikey
+     *
+     * @param body
+     * @return
+     */
     @Override
     public SubAccountApiKeyVO createSubAccountApiKey(SubAccountApiKeyVO body) {
         LambdaQueryWrapper<PlatformSubAccount> queryWrapper = new LambdaQueryWrapper();
@@ -81,10 +93,16 @@ public class PlatformSubAccountServiceImpl extends ServiceImpl<PlatformSubAccoun
         return subAccountApiKeyVO;
     }
 
+    /**
+     * 创建子账户充值地址
+     *
+     * @param body
+     * @return
+     */
     @Override
     public SubAccountDepositAddressVO createDepositAddress(CreateDepositAddressDTO body) {
         SubAccountDepositAddressVO subAccountDepositAddressVO = new SubAccountDepositAddressVO();
-        Balance balance = balanceService.getCurrcyBalance(SpecialUUID.NullUUID.value, CryptoConversionCurrencyEnum.getItem(body.getCcy()));
+        Balance balance = balanceService.getCurrcyBalance(SpecialUUID.NullUUID.value, WalletTypeEnum.OkxWallet, CryptoConversionCurrencyEnum.getItem(body.getCcy()));
         Addresse addresses = new Addresse();
         String chain = body.getChain();
         String[] chains = chain.split("-");
@@ -96,31 +114,55 @@ public class PlatformSubAccountServiceImpl extends ServiceImpl<PlatformSubAccoun
         addresses.setCurrency(body.getCcy());
         addresses.setWalletId(balance.getId());
         addresses.setPlatform(CryptoAssetsPlatform.OKX);
+        addresses.setSubAccount(body.getSubAcct());
         addressesMapper.insert(addresses);
-
         BeanUtils.copyProperties(addresses, subAccountDepositAddressVO);
         return subAccountDepositAddressVO;
     }
 
+    /**
+     * 获取子账户充值地址
+     *
+     * @param subAcct
+     * @param ccy
+     * @return
+     */
     @Override
     public List<SubAccountDepositAddressVO> getDepositAddresses(String subAcct, String ccy) {
         List<SubAccountDepositAddressVO> list = new ArrayList<>();
-        SubAccountDepositAddressVO addressVO = new SubAccountDepositAddressVO();
-        addressVO.setAddr("地址1");
-        addressVO.setTs("1597026383085");
-        addressVO.setMemo("");
-        addressVO.setCcy("USDT");
-        addressVO.setChain("TRC-20");
-        addressVO.setPmtId("");
-        list.add(addressVO);
+        LambdaQueryWrapper<Addresse> addressesLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        addressesLambdaQueryWrapper.eq(Addresse::getPlatform, CryptoAssetsPlatform.OKX);
+        addressesLambdaQueryWrapper.eq(Addresse::getAccountId, SpecialUUID.NullUUID.value);
+        addressesLambdaQueryWrapper.last("limit 20");
+        List<Addresse> addresses = addressesMapper.selectList(addressesLambdaQueryWrapper);
+        if (CollectionUtil.isNotEmpty(addresses)) {
+            for (Addresse address : addresses) {
+                SubAccountDepositAddressVO addressVO = new SubAccountDepositAddressVO();
+                addressVO.setAddr(address.getAddress());
+                addressVO.setTs("1597026383085");
+                addressVO.setMemo("");
+                String chain = OkxUtil.convertChain(address.getChain());
+                addressVO.setCcy(address.getCurrency());
+                addressVO.setChain(address.getCurrency() + "-" + chain);
+                addressVO.setPmtId("");
+                list.add(addressVO);
+            }
+        }
         return list;
     }
 
+
+    /**
+     * 获取子账户子账户充值记录
+     */
     @Override
     public List<SubAccountDepositVO> subAccountDepositHistory(SubAccountDepositDTO body) {
         List<SubAccountDepositVO> subAccountDepositVOS = new ArrayList<>();
         LambdaQueryWrapper<CryptoAssetsTransaction> transactionsLambdaQueryWrapper = new LambdaQueryWrapper<>();
         transactionsLambdaQueryWrapper.eq(CryptoAssetsTransaction::getPlatform, CryptoAssetsPlatform.OKX);
+        transactionsLambdaQueryWrapper.eq(CryptoAssetsTransaction::getSourceType, CircleWalletTypeEnum.BLOCKCHAIN);
+        transactionsLambdaQueryWrapper.eq(CryptoAssetsTransaction::getDestinationType, CircleWalletTypeEnum.WALLET);
+        transactionsLambdaQueryWrapper.eq(CryptoAssetsTransaction::getStatus, CircleTransactionStatusEnum.COMPLETE);
         List<CryptoAssetsTransaction> list = cryptoAssetsTransactionService.list(transactionsLambdaQueryWrapper);
         for (CryptoAssetsTransaction platTransactions : list) {
             SubAccountDepositVO subAccountDepositVO = new SubAccountDepositVO();
@@ -128,17 +170,32 @@ public class PlatformSubAccountServiceImpl extends ServiceImpl<PlatformSubAccoun
             subAccountDepositVO.setTxId(platTransactions.getTransactionHash());
             subAccountDepositVO.setActualDepBlkConfirm("11");
             subAccountDepositVO.setCcy(platTransactions.getCurrency().getValue());
-            subAccountDepositVO.setChain(platTransactions.getChain().getValue());
-            subAccountDepositVO.setFrom("sdjksjkk");
-            subAccountDepositVO.setTo("ghsdjkjhgfhjkjhgfghywewyy");
-            subAccountDepositVO.setTs("1597026383085");
+            String chain = OkxUtil.convertChain(platTransactions.getChain());
+            subAccountDepositVO.setChain(platTransactions.getCurrency() + "-" + chain);
+            subAccountDepositVO.setFrom(platTransactions.getSourceAddress());
+            subAccountDepositVO.setTo(platTransactions.getDestinationAddress());
+            subAccountDepositVO.setTs(platTransactions.getCreateTime().getTime() + "");
             subAccountDepositVO.setState("2");
-            subAccountDepositVO.setDepId("hgshdhshd");
-            subAccountDepositVO.setSubAcct("hgshdhshd");
+            subAccountDepositVO.setDepId(UUID.randomUUID().toString());
+            //TODO 子账户
+            LambdaQueryWrapper<Addresse> addresseLambdaQueryWrapper = new LambdaQueryWrapper<>();
+            addresseLambdaQueryWrapper.eq(Addresse::getAddress, platTransactions.getSourceAddress());
+            Addresse addresse = addressesMapper.selectOne(addresseLambdaQueryWrapper);
+            if (addresse != null) {
+                subAccountDepositVO.setSubAcct(addresse.getSubAccount());
+            }
+            subAccountDepositVOS.add(subAccountDepositVO);
         }
-        return null;
+        return subAccountDepositVOS;
     }
 
+    /**
+     * 获取币兑
+     *
+     * @param fromCcy
+     * @param toCcy
+     * @return
+     */
     @Override
     public ConvertCurrencyPairVO getCurrencyPair(String fromCcy, String toCcy) {
         ConvertCurrencyPairVO convertCurrencyPairVO = new ConvertCurrencyPairVO();

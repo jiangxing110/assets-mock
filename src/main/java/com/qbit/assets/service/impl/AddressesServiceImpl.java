@@ -4,10 +4,7 @@ package com.qbit.assets.service.impl;
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.qbit.assets.common.enums.ChainType;
-import com.qbit.assets.common.enums.CryptoAssetsPlatform;
-import com.qbit.assets.common.enums.CryptoConversionCurrencyEnum;
-import com.qbit.assets.common.enums.SpecialUUID;
+import com.qbit.assets.common.enums.*;
 import com.qbit.assets.domain.entity.Addresse;
 import com.qbit.assets.domain.entity.Balance;
 import com.qbit.assets.mapper.AddressesMapper;
@@ -49,7 +46,7 @@ public class AddressesServiceImpl extends ServiceImpl<AddressesMapper, Addresse>
     public List<AddressVO> getAddresses(String walletId) {
         List<AddressVO> addressVOS = new ArrayList<>();
         LambdaQueryWrapper<Addresse> addressesLambdaQueryWrapper = new LambdaQueryWrapper<>();
-        addressesLambdaQueryWrapper.eq(Addresse::getWalletId, walletId);
+        addressesLambdaQueryWrapper.eq(Addresse::getPlatform, CryptoAssetsPlatform.CIRCLE);
         List<Addresse> addresses = this.list(addressesLambdaQueryWrapper);
         if (CollectionUtil.isNotEmpty(addresses)) {
             addressVOS = addresses.stream().map(e -> {
@@ -72,7 +69,7 @@ public class AddressesServiceImpl extends ServiceImpl<AddressesMapper, Addresse>
         AddressVO addressVO = new AddressVO();
         Addresse addresses = new Addresse();
         addresses.setAccountId(SpecialUUID.NullUUID.value());
-        Balance balance = balanceService.getCurrcyBalance(SpecialUUID.NullUUID.value(), body.getCurrency());
+        Balance balance = balanceService.getCurrcyBalance(SpecialUUID.NullUUID.value(), WalletTypeEnum.CircleWallet, body.getCurrency());
         addresses.setWalletId(balance.getId());
         addresses.setChain(body.getChain());
         addresses.setCurrency(body.getCurrency().getValue());

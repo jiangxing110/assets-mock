@@ -68,4 +68,10 @@ public class Addresse extends BaseV2 {
      */
     private CryptoAssetsPlatform platform;
 
+
+    /**
+     * 平台
+     */
+    private String subAccount;
+
 }

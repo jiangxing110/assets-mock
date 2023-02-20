@@ -1,13 +1,18 @@
 package com.qbit.assets.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.qbit.assets.common.enums.CryptoConversionCurrencyEnum;
 import com.qbit.assets.common.enums.SpecialUUID;
 import com.qbit.assets.common.enums.TransactionTypeEnum;
+import com.qbit.assets.common.enums.WalletTypeEnum;
+import com.qbit.assets.domain.dto.AssetExchangeDto;
 import com.qbit.assets.domain.dto.AssetTransferDto;
 import com.qbit.assets.domain.entity.Balance;
 import com.qbit.assets.domain.entity.CryptoAssetsTransfer;
+import com.qbit.assets.domain.vo.AssetsTransferVo;
 import com.qbit.assets.service.AssetsOkxService;
 import com.qbit.assets.service.BalanceService;
+import com.qbit.assets.service.CryptoAssetsExchangeService;
 import com.qbit.assets.service.CryptoAssetsTransferService;
 import com.qbit.assets.thirdparty.internal.circle.domain.dto.PayoutDTO;
 import com.qbit.assets.thirdparty.internal.circle.domain.dto.PayoutPageDTO;
@@ -36,11 +41,34 @@ public class AssetsOkxServiceImpl implements AssetsOkxService {
     private CryptoAssetsTransferService cryptoAssetsTransferService;
     @Resource
     private BalanceService balanceService;
+    @Resource
+    private CryptoAssetsExchangeService exchangeService;
 
     @Override
     public ConvertTradeVO trade(ConvertTradeDTO body) {
-
-        return null;
+        ConvertTradeVO convertTradeVO = new ConvertTradeVO();
+        AssetExchangeDto assetExchangeDto = new AssetExchangeDto();
+        assetExchangeDto.setQuoteId(body.getQuoteId());
+        String source = body.getBaseCcy();
+        String target = body.getQuoteCcy();
+        //buy 卖：sell
+        if (!"buy".equals(body.getSide())) {
+            source = body.getQuoteCcy();
+            target = body.getBaseCcy();
+        }
+        Balance sourceBalance = balanceService.getCurrcyBalance(SpecialUUID.NullUUID.value, WalletTypeEnum.OkxWallet, CryptoConversionCurrencyEnum.getItem(source));
+        Balance targetBalance = balanceService.getCurrcyBalance(SpecialUUID.NullUUID.value, WalletTypeEnum.OkxWallet, CryptoConversionCurrencyEnum.getItem(target));
+        if (sourceBalance != null && targetBalance != null) {
+            assetExchangeDto.setSource(sourceBalance.getId());
+            assetExchangeDto.setTarget(targetBalance.getId());
+            assetExchangeDto.setAmount(new BigDecimal(body.getSz()));
+            assetExchangeDto.setFee(new BigDecimal("1"));
+            AssetsTransferVo assetsTransferVo = exchangeService.trade(assetExchangeDto);
+            /*convertTradeVO.setQuoteId();
+            convertTradeVO.setTradeId(assetsTransferVo.getTransId());
+            convertTradeVO.setState("fullyFilled");*/
+        }
+        return convertTradeVO;
     }
 
     @Override
@@ -90,6 +118,14 @@ public class AssetsOkxServiceImpl implements AssetsOkxService {
         return marketTickers;
     }
 
+    /**
+     * 创建payout
+     *
+     * @param body
+     * @return com.qbit.assets.thirdparty.internal.circle.domain.vo.PayoutVO
+     * @author martinjiang
+     * @date 2023/2/19 22:20
+     */
     @Override
     public PayoutVO payouts(PayoutDTO body) {
         AssetTransferDto transferDto = new AssetTransferDto();
@@ -111,13 +147,30 @@ public class AssetsOkxServiceImpl implements AssetsOkxService {
         return null;
     }
 
+    /**
+     * 查询 payout 详情
+     *
+     * @param id
+     * @return com.qbit.assets.thirdparty.internal.circle.domain.vo.PayoutVO
+     * @author martinjiang
+     * @date 2023/2/19 22:19
+     */
     @Override
     public PayoutVO getPayout(String id) {
         return null;
     }
 
+    /**
+     * 获取payout list
+     *
+     * @param pageDTO
+     * @return java.util.List<com.qbit.assets.thirdparty.internal.circle.domain.vo.PayoutVO>
+     * @author martinjiang
+     * @date 2023/2/19 22:20
+     */
     @Override
     public List<PayoutVO> payoutList(PayoutPageDTO pageDTO) {
+
         return null;
     }
 }

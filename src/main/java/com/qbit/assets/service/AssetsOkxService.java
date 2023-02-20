@@ -34,9 +34,33 @@ public interface AssetsOkxService {
 
     List<MarketTickerVO> getTickers(Map map);
 
+    /**
+     * 创建payout
+     *
+     * @param body
+     * @return com.qbit.assets.thirdparty.internal.circle.domain.vo.PayoutVO
+     * @author martinjiang
+     * @date 2023/2/19 22:20
+     */
     PayoutVO payouts(PayoutDTO body);
 
+    /**
+     * 查询 payout 详情
+     *
+     * @param id
+     * @return com.qbit.assets.thirdparty.internal.circle.domain.vo.PayoutVO
+     * @author martinjiang
+     * @date 2023/2/19 22:19
+     */
     PayoutVO getPayout(String id);
 
+    /**
+     * 获取payout list
+     *
+     * @param pageDTO
+     * @return java.util.List<com.qbit.assets.thirdparty.internal.circle.domain.vo.PayoutVO>
+     * @author martinjiang
+     * @date 2023/2/19 22:20
+     */
     List<PayoutVO> payoutList(PayoutPageDTO pageDTO);
 }

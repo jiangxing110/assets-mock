@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.qbit.assets.common.enums.BalanceColumnTypeEnum;
 import com.qbit.assets.common.enums.CryptoConversionCurrencyEnum;
 import com.qbit.assets.common.enums.SpecialUUID;
+import com.qbit.assets.common.enums.WalletTypeEnum;
 import com.qbit.assets.common.error.CustomException;
 import com.qbit.assets.common.utils.RedisLockUtil;
 import com.qbit.assets.domain.entity.Balance;
@@ -182,10 +183,11 @@ public class BalanceServiceImpl extends ServiceImpl<BalanceMapper, Balance> impl
      * @return
      */
     @Override
-    public Balance getCurrcyBalance(String accountId, CryptoConversionCurrencyEnum currency) {
+    public Balance getCurrcyBalance(String accountId, WalletTypeEnum walletType, CryptoConversionCurrencyEnum currency) {
         LambdaQueryWrapper<Balance> balanceLambdaQueryWrapper = new LambdaQueryWrapper<>();
-        balanceLambdaQueryWrapper.eq(Balance::getAccountId, SpecialUUID.NullUUID.value());
-        balanceLambdaQueryWrapper.eq(Balance::getWalletType, "OkxWallet");
+        balanceLambdaQueryWrapper.eq(Balance::getAccountId, accountId);
+        balanceLambdaQueryWrapper.eq(Balance::getWalletType, walletType);
+        balanceLambdaQueryWrapper.eq(Balance::getCurrency, currency);
         balanceLambdaQueryWrapper.last("limit 1");
         Balance balances = balanceMapper.selectOne(balanceLambdaQueryWrapper);
         return balances;

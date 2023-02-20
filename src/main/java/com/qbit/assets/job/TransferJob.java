@@ -8,6 +8,9 @@ import com.qbit.assets.domain.entity.CryptoAssetsTransfer;
 import com.qbit.assets.service.CryptoAssetsTransactionService;
 import com.qbit.assets.service.CryptoAssetsTransferService;
 import com.qbit.assets.thirdparty.internal.circle.enums.CircleTransactionStatusEnum;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -19,6 +22,8 @@ import java.util.List;
  * @date 2023/2/19 19:42
  */
 @Component
+@EnableScheduling
+@EnableAsync
 public class TransferJob {
 
     @Resource
@@ -26,10 +31,10 @@ public class TransferJob {
     @Resource
     private CryptoAssetsTransactionService cryptoAssetsTransactionService;
 
-    //@Scheduled(cron = "0/2 * * * * ? ")
+    @Scheduled(cron = "0 */1 * * * ?")
     public void test() {
         LambdaQueryWrapper<CryptoAssetsTransfer> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-        lambdaQueryWrapper.eq(CryptoAssetsTransfer::getStatus, CryptoAssetsTransferStatus.Pending);
+        lambdaQueryWrapper.eq(CryptoAssetsTransfer::getDisplayStatus, CryptoAssetsTransferStatus.Pending);
         List<CryptoAssetsTransfer> list = cryptoAssetsTransferService.list(lambdaQueryWrapper);
         if (CollectionUtil.isNotEmpty(list)) {
             for (CryptoAssetsTransfer cryptoAssetsTransfer : list) {
@@ -39,7 +44,7 @@ public class TransferJob {
     }
 
 
-    //@Scheduled(cron = "0/2 * * * * ? ")
+    @Scheduled(cron = "0 */1 * * * ?")
     public void testConcurrence() {
         LambdaQueryWrapper<CryptoAssetsTransaction> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(CryptoAssetsTransaction::getStatus, CryptoAssetsTransferStatus.Pending);

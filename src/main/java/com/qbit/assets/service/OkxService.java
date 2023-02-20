@@ -29,6 +29,5 @@ public interface OkxService {
      * 链上提现记录
      */
     List<WithdrawalHistoryVO> getWithdrawals(Map<String, Object> params);
-
-
+    
 }
